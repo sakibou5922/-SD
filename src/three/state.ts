@@ -21,6 +21,12 @@ export const sceneState = {
   idleSpeed: 0.04,
   knotOpacity: 0,
   slabOpacity: 0,
+  /** About: planet body inside the ring of points */
+  planetOpacity: 0,
+  /** Contact: light travelling along the ring */
+  orbitOpacity: 0,
+  /** Hero: small ringed planet in the far background */
+  farOpacity: 1,
   camX: 0, camY: 4.2, camZ: 8.0,
   tX: 0, tY: 0, tZ: 0,
   fov: 42,

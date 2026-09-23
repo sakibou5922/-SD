@@ -109,7 +109,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       defines,
       transparent: true,
       depthWrite: false,
-      depthTest: false,
+      depthTest: true,
       blending: THREE.AdditiveBlending,
       premultipliedAlpha: true,
     });
@@ -124,7 +124,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   lines.visible = false;
   group.add(points, glow, lines);
 
-  const fresnel = (base: THREE.Color, rim: THREE.Color, power: number) =>
+  const fresnel = (base: THREE.Color, rim: THREE.Color, power: number, bodyAlpha = 0.15, depthWrite = false) =>
     new THREE.ShaderMaterial({
       vertexShader: FRESNEL_VERT,
       fragmentShader: FRESNEL_FRAG,
@@ -133,9 +133,10 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
         uRim: { value: rim.clone() },
         uPower: { value: power },
         uOpacity: { value: 0 },
+        uBodyAlpha: { value: bodyAlpha },
       },
       transparent: true,
-      depthWrite: false,
+      depthWrite,
       premultipliedAlpha: true,
     });
   const knotMat = fresnel(COLORS.knotBase, COLORS.knotRim, 2.6);
@@ -146,6 +147,36 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   slabMesh.position.y = 0.2;
   slabMesh.visible = false;
   group.add(knotMesh, slabMesh);
+
+  /* About: planet body. Writes depth and draws first so the ring of points passes behind it. */
+  const planetMat = fresnel(new THREE.Color('#152650'), new THREE.Color('#8ad8ff'), 2.2, 0.92, true);
+  const planetMesh = new THREE.Mesh(new THREE.SphereGeometry(1.9, opts.isMobile ? 32 : 56, opts.isMobile ? 20 : 36), planetMat);
+  planetMesh.renderOrder = -2;
+  planetMesh.visible = false;
+  group.add(planetMesh);
+
+  /* Contact: a light travelling along the ring (T6 geometry: R 2.6, tilted 18°) */
+  const orbitMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#e8f6ff'), transparent: true, opacity: 0, depthWrite: false });
+  const orbitMesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), orbitMat);
+  const orbitGlowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#8ad8ff'), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const orbitGlow = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 12), orbitGlowMat);
+  orbitMesh.add(orbitGlow);
+  orbitMesh.visible = false;
+  group.add(orbitMesh);
+
+  /* Hero: small ringed planet in the far background (world space, does not rotate with the group) */
+  const farGroup = new THREE.Group();
+  const farMat = fresnel(new THREE.Color('#1c2358'), new THREE.Color('#c9b8ff'), 2.4, 0.95, true);
+  const farPlanet = new THREE.Mesh(new THREE.SphereGeometry(opts.isMobile ? 0.28 : 0.4, 32, 20), farMat);
+  farPlanet.renderOrder = -2;
+  const farRingMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#a98bff'), transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+  const farRing = new THREE.Mesh(new THREE.RingGeometry(opts.isMobile ? 0.38 : 0.55, opts.isMobile ? 0.55 : 0.8, 64), farRingMat);
+  farRing.rotation.x = Math.PI / 2 - 0.35;
+  farRing.rotation.z = 0.3;
+  farGroup.add(farPlanet, farRing);
+  // projected with the hero camera: desktop ≈ (1190px, 140px) of 1440×900, mobile ≈ (330px, 110px) of 390×844
+  farGroup.position.set(opts.isMobile ? 1.1 : 3.4, opts.isMobile ? 2.6 : 1.8, opts.isMobile ? -0.6 : -1.4);
+  scene.add(farGroup);
 
   /* ---------- interaction ---------- */
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -195,6 +226,22 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     knotMat.uniforms.uOpacity.value = S.knotOpacity;
     slabMesh.visible = S.slabOpacity > 0.002;
     slabMat.uniforms.uOpacity.value = S.slabOpacity;
+    planetMesh.visible = S.planetOpacity > 0.002;
+    planetMat.uniforms.uOpacity.value = S.planetOpacity;
+    planetMesh.rotation.y = time * 0.05;
+    // orbiting light: ring param → tilt 18° about X (matches the T6 target)
+    orbitMesh.visible = S.orbitOpacity > 0.002;
+    orbitMat.opacity = S.orbitOpacity;
+    orbitGlowMat.opacity = S.orbitOpacity * 0.35;
+    {
+      const a = time * 0.45, R = 2.6, tilt = (18 * Math.PI) / 180;
+      const x = R * Math.cos(a), z = R * Math.sin(a);
+      orbitMesh.position.set(x, -z * Math.sin(tilt), z * Math.cos(tilt));
+    }
+    farGroup.visible = S.farOpacity > 0.002;
+    farMat.uniforms.uOpacity.value = S.farOpacity;
+    farRingMat.opacity = S.farOpacity * 0.45;
+    farGroup.rotation.y = time * 0.03;
 
     // idle + parallax
     mouse.x += (mouse.tx - mouse.x) * 0.05;
@@ -291,7 +338,9 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     document.removeEventListener('visibilitychange', onVisibility);
     geo.dispose(); lineGeo.dispose();
     pointsMat.dispose(); glowMat.dispose(); lineMat.dispose(); knotMat.dispose(); slabMat.dispose();
-    knotMesh.geometry.dispose(); slabMesh.geometry.dispose();
+    planetMat.dispose(); orbitMat.dispose(); orbitGlowMat.dispose(); farMat.dispose(); farRingMat.dispose();
+    knotMesh.geometry.dispose(); slabMesh.geometry.dispose(); planetMesh.geometry.dispose();
+    orbitMesh.geometry.dispose(); orbitGlow.geometry.dispose(); farPlanet.geometry.dispose(); farRing.geometry.dispose();
     renderer.dispose();
   };
 

@@ -71,6 +71,7 @@ export function setupSections(o: SectionsOptions): () => void {
     S.groupY = heroY;
     seg(tl, 0, 1, { camX: 0, camY: 4.2, camZ: 8.0, pointSize: 2.6, groupY: heroY }, { camX: 0.4, camY: 2.6, camZ: 7.4, pointSize: 2.0, groupY: 0 });
     seg(tl, 0.75, 1, { w0: 1, w1: 0 }, { w0: 0.6, w1: 0.4 });
+    seg(tl, 0.55, 0.95, { farOpacity: 1 }, { farOpacity: 0 });
     tl.fromTo('#hero-inner', { y: 0, opacity: 1 }, { y: -80, opacity: 0, duration: 0.6, immediateRender: false }, EPS);
     tls.push(tl);
   }
@@ -81,6 +82,8 @@ export function setupSections(o: SectionsOptions): () => void {
     seg(tl, 0, 0.35, { w0: 0.6, w1: 0.4, noise: 0.12, accentMix: 0.1 }, { w0: 0, w1: 1, noise: 0.08, accentMix: 0.25 });
     seg(tl, 0, 0.4, { camX: 0.4, camY: 2.6, camZ: 7.4, tX: 0 }, { camX: 1.2, camY: 0.6, camZ: 6.5, tX: X_ABOUT });
     seg(tl, 0, 1, { rotY: 0 }, { rotY: 0.4 });
+    seg(tl, 0.12, 0.4, { planetOpacity: 0 }, { planetOpacity: 0.85 });
+    seg(tl, 0.8, 1, { planetOpacity: 0.85 }, { planetOpacity: 0 });
     bg(tl, 0, 0.4, { '--bg-x': '50%', '--bg-y': '60%' }, { '--bg-x': '62%', '--bg-y': '45%' });
     seg(tl, 0.8, 1, { w1: 1, w2: 0 }, { w1: 0.5, w2: 0.5 });
     tls.push(tl);
@@ -178,6 +181,7 @@ export function setupSections(o: SectionsOptions): () => void {
       { w5: 0, w6: 1, pointSize: 2.0, noise: 0.05, breath: 0.02, accentMix: 0.4, idleSpeed: 0.04, colorMix: 1 });
     seg(tl, 0, morphEnd, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, groupY: 0 }, { camX: 0, camY: 0.4, camZ: 7.5, tX: X_CONTACT, tY: 0, groupY });
     bg(tl, 0, morphEnd, { '--bg-x': '35%', '--bg-y': '55%' }, { '--bg-x': '50%', '--bg-y': '50%' });
+    seg(tl, morphEnd * 0.6, morphEnd, { orbitOpacity: 0 }, { orbitOpacity: 1 });
     // footer tail
     seg(tl, 0.7, 1, { opacity: 1, camZ: 7.5 }, { opacity: 0.35, camZ: 8.5 });
     bg(tl, 0.7, 1, { '--bg-y': '50%' }, { '--bg-y': '100%' });

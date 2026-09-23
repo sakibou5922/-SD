@@ -157,12 +157,13 @@ uniform vec3 uBase;
 uniform vec3 uRim;
 uniform float uPower;
 uniform float uOpacity;
+uniform float uBodyAlpha;   // opacity of the face-on body (0.15 = glassy, 0.9 = solid planet)
 varying vec3 vN;
 varying vec3 vV;
 void main() {
   float f = pow(1.0 - max(dot(normalize(vN), normalize(vV)), 0.0), uPower);
   vec3 c = mix(uBase, uRim, f);
-  float a = (0.15 + 0.85 * f) * uOpacity;
+  float a = (uBodyAlpha + (1.0 - uBodyAlpha) * f) * uOpacity;
   gl_FragColor = vec4(c * a, a);
 }
 `;

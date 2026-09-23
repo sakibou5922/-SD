@@ -88,19 +88,33 @@ export function buildTargets(opts: TargetOptions): TargetSet {
     }
   }
 
-  /* T1 sphere (Fibonacci) */
+  /* T1 planet — thin ring of points around the planet mesh + a sparse atmosphere shell */
   const sphere = new Float32Array(n * 3);
   {
-    const R = 2.3;
+    const SHELL = 2.05, R_IN = 2.7, R_OUT = 3.8;
     const golden = Math.PI * (1 + Math.sqrt(5));
+    const tiltX = (22 * Math.PI) / 180, tiltZ = (10 * Math.PI) / 180;
+    const cx = Math.cos(tiltX), sx = Math.sin(tiltX), cz = Math.cos(tiltZ), sz = Math.sin(tiltZ);
     for (let i = 0; i < n; i++) {
-      const phi = Math.acos(1 - (2 * (i + 0.5)) / n);
-      const theta = golden * i;
-      const j = 1 + 0.03 * (rand() - 0.5);
-      const sp = Math.sin(phi);
-      sphere[i * 3] = R * sp * Math.cos(theta) * j;
-      sphere[i * 3 + 1] = R * sp * Math.sin(theta) * j;
-      sphere[i * 3 + 2] = R * Math.cos(phi) * j;
+      let x: number, y: number, z: number;
+      if (i % 3 === 0) {
+        // atmosphere shell (Fibonacci sphere just outside the mesh)
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / n);
+        const theta = golden * i;
+        const j = SHELL * (1 + 0.04 * (rand() - 0.5));
+        x = j * Math.sin(phi) * Math.cos(theta); y = j * Math.sin(phi) * Math.sin(theta); z = j * Math.cos(phi);
+      } else {
+        // ring: denser inner band, a faint gap, then the outer band
+        const u = rand();
+        const band = u < 0.62 ? R_IN + (R_OUT - R_IN) * 0.45 * (u / 0.62) : R_IN + (R_OUT - R_IN) * (0.55 + 0.45 * ((u - 0.62) / 0.38));
+        const a2 = rand() * Math.PI * 2;
+        x = band * Math.cos(a2); z = band * Math.sin(a2);
+        y = (rand() + rand() + rand() - 1.5) * 0.04;
+      }
+      // tilt the whole target so the ring reads as a plane seen at an angle
+      const y1 = y * cx - z * sx, z1 = y * sx + z * cx;
+      const x2 = x * cz - y1 * sz, y2 = x * sz + y1 * cz;
+      sphere[i * 3] = x2; sphere[i * 3 + 1] = y2; sphere[i * 3 + 2] = z1;
     }
   }
 
