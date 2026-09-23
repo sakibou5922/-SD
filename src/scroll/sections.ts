@@ -143,7 +143,7 @@ export function setupSections(o: SectionsOptions): () => void {
     const tl = sectionTimeline('works');
     seg(tl, 0, 0.3, { knotOpacity: 0, pointSize: 2.0, lineOpacity: 0.35, accentMix: 0.25, colorMix: 0.5 }, { knotOpacity: 0.55, pointSize: 1.6, lineOpacity: 0.15, accentMix: 0.6, colorMix: 1 });
     seg(tl, 0, 0.3, { camX: 2.2, camY: 1.0, camZ: 5.2, tX: X_PROCESS, fov: 40 }, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, fov: 38 });
-    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#141a26' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#1a1712' });
+    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#141b3a' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' });
     seg(tl, 0, 1, { tY: 0 }, { tY: 0.2 });
     // the solid fades out while the cards are still on screen (brief §3.1: glow stays a minority)
     seg(tl, 0.6, 0.8, { knotOpacity: 0.55 }, { knotOpacity: 0 });
@@ -160,7 +160,7 @@ export function setupSections(o: SectionsOptions): () => void {
       { w4: 0, w5: 1, noise: 0.02, accentMix: 0.15, idleSpeed: 0.01, colorMix: 0.3, rotX: 0, breath: 0.012 });
     seg(tl, 0.15, 0.4, { slabOpacity: 0 }, { slabOpacity: 0.8 });
     seg(tl, 0, 0.3, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, tY: 0.2, fov: 38 }, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, fov: 42 });
-    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#1a1712' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#141a26' });
+    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#141b3a' });
     tls.push(tl);
   }
 

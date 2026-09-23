@@ -1,25 +1,25 @@
 :root {
   color-scheme: dark;
 
-  /* Base (Brand Guardian §3.1) */
-  --sd-bg: #0b0e14;
-  --sd-bg-deep: #070910;
-  --sd-bg-2: #141a26;
-  --sd-bg-2-warm: #1a1712;
-  --sd-surface: #131822;
-  --sd-surface-2: #1b2230;
-  --sd-line: #273043;
+  /* Base (Brand Guardian §3.1, v1.1 宇宙配色: 深い藍 + 星明かりの水色 + 星の金) */
+  --sd-bg: #080b1c;
+  --sd-bg-deep: #05071a;
+  --sd-bg-2: #141b3a;
+  --sd-bg-2-warm: #2a1638;
+  --sd-surface: #10152b;
+  --sd-surface-2: #182040;
+  --sd-line: #27305a;
 
   /* Text */
   --sd-text: #f2f4f7;
-  --sd-text-2: #9aa3b2;
-  --sd-text-3: #6b7484;
+  --sd-text-2: #a3acc4;
+  --sd-text-3: #6f7893;
 
   /* Accent */
-  --sd-primary: #5ee1c5;
-  --sd-secondary: #d4a65a;
+  --sd-primary: #8ad8ff;
+  --sd-secondary: #f0c674;
   --sd-signal: #ff6b4a;
-  --sd-signal-text: #0b0e14;
+  --sd-signal-text: #080b1c;
 
   /* Fonts */
   --sd-font-jp: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
@@ -61,7 +61,7 @@
   /* Background driver (tweened by GSAP) */
   --bg-x: 50%;
   --bg-y: 60%;
-  --bg-c: #141a26;
+  --bg-c: #141b3a;
 }
 
 @media (min-width: 768px) {

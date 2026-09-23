@@ -5,13 +5,13 @@
 }
 /* keep scrims below content but above the fixed canvas: sections sit inside z-index:2 main */
 .section { isolation: isolate; }
-.scrim-l::before { background: linear-gradient(90deg, rgba(11, 14, 20, 0.78) 0%, rgba(11, 14, 20, 0.55) 45%, transparent 75%); }
-.scrim-r::before { background: linear-gradient(270deg, rgba(11, 14, 20, 0.78) 0%, rgba(11, 14, 20, 0.55) 45%, transparent 75%); }
-.scrim-c::before { background: radial-gradient(60% 50% at 50% 50%, rgba(11, 14, 20, 0.7) 0%, transparent 100%); }
+.scrim-l::before { background: linear-gradient(90deg, rgba(8, 11, 28, 0.78) 0%, rgba(8, 11, 28, 0.55) 45%, transparent 75%); }
+.scrim-r::before { background: linear-gradient(270deg, rgba(8, 11, 28, 0.78) 0%, rgba(8, 11, 28, 0.55) 45%, transparent 75%); }
+.scrim-c::before { background: radial-gradient(60% 50% at 50% 50%, rgba(8, 11, 28, 0.7) 0%, transparent 100%); }
 .section--hero::before { opacity: 0.5; }
 @media (max-width: 767px) {
   .scrim-l::before, .scrim-r::before {
-    background: linear-gradient(180deg, transparent 0%, rgba(11, 14, 20, 0.7) 30%, rgba(11, 14, 20, 0.85) 100%);
+    background: linear-gradient(180deg, transparent 0%, rgba(8, 11, 28, 0.7) 30%, rgba(8, 11, 28, 0.85) 100%);
   }
 }
 

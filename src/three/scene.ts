@@ -20,13 +20,13 @@ export type SceneController = {
 const BASE_SCALE = 0.75;
 
 const COLORS = {
-  base: new THREE.Color('#9fb0c4'),
-  primary: new THREE.Color('#5ee1c5'),
-  secondary: new THREE.Color('#d4a65a'),
-  knotBase: new THREE.Color('#1e2533'),
-  knotRim: new THREE.Color('#d4a65a'),
-  slabBase: new THREE.Color('#2a3446'),
-  slabRim: new THREE.Color('#d9d4c7'),
+  base: new THREE.Color('#c7d6f0'),   // cool starlight white
+  primary: new THREE.Color('#8ad8ff'), // star cyan
+  secondary: new THREE.Color('#f0c674'), // star gold
+  knotBase: new THREE.Color('#1a1f3d'),
+  knotRim: new THREE.Color('#f0c674'),
+  slabBase: new THREE.Color('#2a3358'),
+  slabRim: new THREE.Color('#e6e9f5'),
 };
 
 export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean; interactive: boolean }): SceneController | null {
