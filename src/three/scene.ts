@@ -94,13 +94,14 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     uColorB: { value: COLORS.primary.clone() },
     uClusterLit: { value: new Float32Array(4) },
     uGlow: { value: 1 },
+    uSizeMul: { value: 1 },
     uLineOpacity: { value: 0 },
   };
-  const mkMaterial = (defines: Record<string, string>, glow: number) =>
+  const mkMaterial = (defines: Record<string, string>, glow: number, sizeMul = 1) =>
     new THREE.ShaderMaterial({
       vertexShader: POINTS_VERT,
       fragmentShader: POINTS_FRAG,
-      uniforms: { ...uniforms, uGlow: { value: glow } },
+      uniforms: { ...uniforms, uGlow: { value: glow }, uSizeMul: { value: sizeMul } },
       defines,
       transparent: true,
       depthWrite: false,
@@ -109,7 +110,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       premultipliedAlpha: true,
     });
   const pointsMat = mkMaterial({}, 1);
-  const glowMat = mkMaterial({}, 0.08);
+  const glowMat = mkMaterial({}, 0.08, 3); // halo pass: 3x size, 8% alpha
   const lineMat = mkMaterial({ LINE: '' }, 1);
 
   const points = new THREE.Points(geo, pointsMat);
@@ -226,11 +227,10 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     time += dt;
     // footer: 30fps when the scene is mostly faded out
     if (S.opacity < 0.3) { skip = !skip; if (skip) return; }
-    const t0 = performance.now();
     applyState(dt);
     render();
-    const ft = performance.now() - t0;
-    acc += ft; frames++;
+    // adaptive DPR on the real frame interval (covers GPU-bound devices, not just JS time)
+    acc += dt * 1000; frames++;
     if (frames >= 60) {
       const avg = acc / frames;
       acc = 0; frames = 0;

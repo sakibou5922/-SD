@@ -8,9 +8,8 @@ import { setupHeader } from './ui/header';
 import { setupIndicator } from './ui/indicator';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// point count / DPR are chosen once at load; scroll timelines are rebuilt per breakpoint below
 const isMobile = window.matchMedia('(max-width: 767px)').matches;
-const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-const isTablet = !isMobile && !isDesktop;
 
 /* ---------- 3D ---------- */
 let scene: SceneController | null = null;
@@ -18,13 +17,19 @@ const canvas = document.getElementById('scene') as HTMLCanvasElement | null;
 if (canvas && hasWebGL()) {
   scene = createScene(canvas, { isMobile, interactive: !reduced });
   if (scene) {
+    // one recovery attempt; if the context is not restored within 4s (or is lost again) fall back
     let restored = false;
+    let lostTimer = 0;
     canvas.addEventListener('webglcontextlost', (e) => {
       e.preventDefault();
       if (restored) { disableWebGL(); return; }
       restored = true;
+      lostTimer = window.setTimeout(disableWebGL, 4000);
     });
-    canvas.addEventListener('webglcontextrestored', () => { if (!reduced) scene?.start(); else scene?.renderOnce(); });
+    canvas.addEventListener('webglcontextrestored', () => {
+      window.clearTimeout(lostTimer);
+      if (!reduced) scene?.start(); else scene?.renderOnce();
+    });
   }
 }
 if (!scene) disableWebGL();
@@ -70,7 +75,15 @@ if (reduced) {
   setupReveals(document, true);
   gsap.set('#hero-inner, #scroll-hint', { opacity: 1 });
 } else {
-  setupSections({ scene, pinService: isDesktop, pinProcess: isDesktop || isTablet, shift: isMobile ? 0 : 1 });
+  // gsap.matchMedia reverts every tween / ScrollTrigger made inside when a breakpoint is crossed
+  const mm = gsap.matchMedia();
+  mm.add(
+    { desktop: '(min-width: 1024px)', tablet: '(min-width: 768px) and (max-width: 1023px)', mobile: '(max-width: 767px)' },
+    (ctx) => {
+      const c = ctx.conditions as { desktop: boolean; tablet: boolean; mobile: boolean };
+      return setupSections({ scene, pinService: c.desktop, pinProcess: c.desktop || c.tablet, shift: c.mobile ? 0 : 1 });
+    },
+  );
   setupReveals(document, false);
   heroIntro();
   scene?.start();
@@ -103,11 +116,15 @@ if (document.fonts?.ready) document.fonts.ready.then(refresh);
 window.addEventListener('load', () => {
   refresh();
   const hash = location.hash;
-  if (hash && hash !== '#top' && document.querySelector(hash)) {
+  if (hash && hash !== '#top' && document.getElementById(hash.slice(1))) {
     requestAnimationFrame(() => smooth.scrollTo(hash, { immediate: true }));
   }
 });
 let lastWidth = window.innerWidth;
+let refreshTimer = 0;
 window.addEventListener('resize', () => {
-  if (window.innerWidth !== lastWidth) { lastWidth = window.innerWidth; refresh(); }
+  if (window.innerWidth === lastWidth) return; // ignore mobile address-bar height changes
+  lastWidth = window.innerWidth;
+  window.clearTimeout(refreshTimer);
+  refreshTimer = window.setTimeout(refresh, 200);
 });

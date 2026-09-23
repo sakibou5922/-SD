@@ -61,6 +61,7 @@ uniform float uW[7];
 uniform float uTime;
 uniform float uNoiseAmp;
 uniform float uPointSize;
+uniform float uSizeMul;
 uniform float uDpr;
 uniform float uBreath;
 uniform float uOpacity;
@@ -106,7 +107,7 @@ void main() {
   #ifdef LINE
     vAlpha *= 0.9;
   #else
-    gl_PointSize = uPointSize * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (6.0 / d);
+    gl_PointSize = uPointSize * uSizeMul * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (6.0 / d);
   #endif
   gl_Position = projectionMatrix * mv;
 }

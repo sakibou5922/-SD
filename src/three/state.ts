@@ -32,6 +32,6 @@ export type SceneKey = keyof SceneState;
 /** Static end-state used for prefers-reduced-motion (storyboard §5.3). */
 export const REDUCED_STATE: Partial<SceneState> = {
   w0: 0, w1: 0, w2: 0, w3: 0, w4: 0.6, w5: 0, w6: 0.4,
-  noise: 0, breath: 0, knotOpacity: 0.6, lineOpacity: 0.15, pointSize: 1.8,
+  noise: 0, breath: 0, knotOpacity: 0.6, lineOpacity: 0, pointSize: 1.8,
   camX: 0, camY: 0.3, camZ: 6.5, rotX: 0.3, colorMix: 0.6, accentMix: 0.3,
 };

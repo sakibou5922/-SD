@@ -36,7 +36,7 @@ export function setupHeader(smooth: Smooth): HeaderController {
   /* anchor links → smooth scroll */
   document.addEventListener('click', (e) => {
     const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
-    if (!a) return;
+    if (!a || a.classList.contains('skip-link')) return;
     const href = a.getAttribute('href')!;
     if (href === '#') return;
     e.preventDefault();
@@ -46,19 +46,25 @@ export function setupHeader(smooth: Smooth): HeaderController {
       history.replaceState(null, '', location.pathname + location.search);
       return;
     }
-    if (!document.querySelector(href)) return;
+    const target = document.getElementById(href.slice(1));
+    if (!target) return;
     keepVisibleUntil = performance.now() + 1600;
     header.classList.remove('is-hidden');
     smooth.scrollTo(href);
     history.replaceState(null, '', href);
+    // move keyboard focus to the section without fighting the smooth scroll
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
   });
 
   /* mobile menu */
+  const headerControls = () => Array.from(header.querySelectorAll<HTMLElement>('a, button')).filter((el) => el.offsetParent !== null);
   const focusable = () => Array.from(menu.querySelectorAll<HTMLElement>('a, button'));
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape') { closeMenu(); menuBtn.focus(); return; }
     if (e.key !== 'Tab') return;
-    const els = [menuBtn, ...focusable()];
+    // trap covers the visible header controls (wordmark, CTA, menu button) and the menu links
+    const els = [...headerControls(), ...focusable()];
     const first = els[0], last = els[els.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
