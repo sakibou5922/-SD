@@ -1,0 +1,113 @@
+import './styles/index.css';
+import { gsap, ScrollTrigger, createSmoothScroll } from './scroll/smooth';
+import { setupReveals, buildRevealTimeline } from './scroll/reveal';
+import { setupSections } from './scroll/sections';
+import { createScene, hasWebGL, type SceneController } from './three/scene';
+import { sceneState, REDUCED_STATE } from './three/state';
+import { setupHeader } from './ui/header';
+import { setupIndicator } from './ui/indicator';
+
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = window.matchMedia('(max-width: 767px)').matches;
+const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+const isTablet = !isMobile && !isDesktop;
+
+/* ---------- 3D ---------- */
+let scene: SceneController | null = null;
+const canvas = document.getElementById('scene') as HTMLCanvasElement | null;
+if (canvas && hasWebGL()) {
+  scene = createScene(canvas, { isMobile, interactive: !reduced });
+  if (scene) {
+    let restored = false;
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      if (restored) { disableWebGL(); return; }
+      restored = true;
+    });
+    canvas.addEventListener('webglcontextrestored', () => { if (!reduced) scene?.start(); else scene?.renderOnce(); });
+  }
+}
+if (!scene) disableWebGL();
+
+function disableWebGL(): void {
+  scene?.dispose();
+  scene = null;
+  document.documentElement.dataset.webgl = '0';
+  canvas?.remove();
+}
+
+/* ---------- Scroll / UI ---------- */
+const smooth = createSmoothScroll(!reduced);
+const header = setupHeader(smooth);
+const indicator = setupIndicator(smooth);
+
+/* Active section = the last section whose top has passed the middle of the viewport. */
+const sectionEls = Array.from(document.querySelectorAll<HTMLElement>('section[data-section]'));
+let activeId = '';
+let activeTick = false;
+const updateActive = () => {
+  activeTick = false;
+  const mid = window.innerHeight * 0.5;
+  let current = sectionEls[0];
+  for (const el of sectionEls) {
+    if (el.getBoundingClientRect().top <= mid) current = el;
+  }
+  const id = current?.id ?? '';
+  if (id !== activeId) {
+    activeId = id;
+    header.setActive(id);
+    indicator.setActive(id);
+  }
+};
+window.addEventListener('scroll', () => {
+  if (!activeTick) { activeTick = true; requestAnimationFrame(updateActive); }
+}, { passive: true });
+updateActive();
+
+if (reduced) {
+  Object.assign(sceneState, REDUCED_STATE);
+  scene?.renderOnce();
+  setupReveals(document, true);
+  gsap.set('#hero-inner, #scroll-hint', { opacity: 1 });
+} else {
+  setupSections({ scene, pinService: isDesktop, pinProcess: isDesktop || isTablet, shift: isMobile ? 0 : 1 });
+  setupReveals(document, false);
+  heroIntro();
+  scene?.start();
+}
+
+/* ---------- Hero intro (time-based, once) ---------- */
+function heroIntro(): void {
+  const items = gsap.utils.toArray<HTMLElement>('#hero [data-reveal]');
+  const hint = document.getElementById('scroll-hint')!;
+  gsap.set(hint, { opacity: 0 });
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' }, delay: 0.2 });
+  tl.fromTo('.wordmark', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0);
+  buildRevealTimeline(tl, items);
+  tl.to(hint, { opacity: 1, duration: 0.8 }, '+=0.3');
+  tl.call(() => {
+    const loop = gsap.to(hint, { y: 8, duration: 1.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    const stopHint = () => {
+      loop.kill();
+      gsap.to(hint, { opacity: 0, y: 0, duration: 0.4, overwrite: true });
+      window.removeEventListener('scroll', stopHint);
+    };
+    if (window.scrollY > 10) stopHint();
+    else window.addEventListener('scroll', stopHint, { passive: true, once: true });
+  });
+}
+
+/* ---------- Layout refresh & hash landing ---------- */
+const refresh = () => ScrollTrigger.refresh();
+if (document.fonts?.ready) document.fonts.ready.then(refresh);
+window.addEventListener('load', () => {
+  refresh();
+  const hash = location.hash;
+  if (hash && hash !== '#top' && document.querySelector(hash)) {
+    requestAnimationFrame(() => smooth.scrollTo(hash, { immediate: true }));
+  }
+});
+let lastWidth = window.innerWidth;
+window.addEventListener('resize', () => {
+  if (window.innerWidth !== lastWidth) { lastWidth = window.innerWidth; refresh(); }
+});

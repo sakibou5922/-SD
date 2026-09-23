@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0B0E14" />
+    <title>株式会社SD｜構造が、動き出す。Web制作スタジオ</title>
+    <meta
+      name="description"
+      content="株式会社SDは、Webサイトの企画・情報設計からデザイン、フロントエンド実装、公開後の運用までを一貫して手がける小さなWeb制作スタジオです。構造・動き・コードをひとつのデザインとして、長く使えるサイトをつくります。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="構造が、動き出す。｜株式会社SD" />
+    <meta
+      property="og:description"
+      content="株式会社SDは、Webサイトの企画・情報設計からデザイン、フロントエンド実装、公開後の運用までを一貫して手がける小さなWeb制作スタジオです。構造・動き・コードをひとつのデザインとして、長く使えるサイトをつくります。"
+    />
+    <meta property="og:site_name" content="株式会社SD" />
+    <meta property="og:locale" content="ja_JP" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Inter+Tight:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へスキップ</a>
+
+    <div class="bg" aria-hidden="true">
+      <div class="bg-fallback"></div>
+    </div>
+    <canvas id="scene" class="scene" aria-hidden="true" tabindex="-1"></canvas>
+
+    <header class="header" id="header">
+      <a class="wordmark" href="#top" aria-label="株式会社SD トップへ">SD</a>
+      <nav class="nav" aria-label="メインナビゲーション">
+        <ul class="nav__list" id="nav-list">
+          <li><a href="#about" data-section="about"><span class="nav__en">About</span><span class="nav__jp">私たちについて</span></a></li>
+          <li><a href="#service" data-section="service"><span class="nav__en">Service</span><span class="nav__jp">サービス</span></a></li>
+          <li><a href="#process" data-section="process"><span class="nav__en">Process</span><span class="nav__jp">進め方</span></a></li>
+          <li><a href="#works" data-section="works"><span class="nav__en">Works</span><span class="nav__jp">実績</span></a></li>
+          <li><a href="#company" data-section="company"><span class="nav__en">Company</span><span class="nav__jp">会社概要</span></a></li>
+          <li><a href="#contact" data-section="contact"><span class="nav__en">Contact</span><span class="nav__jp">お問い合わせ</span></a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--outline header__cta" href="#contact">相談する</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="メニューを開く">
+        <span class="menu-btn__bar"></span>
+        <span class="menu-btn__bar"></span>
+      </button>
+    </header>
+
+    <div class="menu" id="menu" hidden>
+      <nav aria-label="モバイルナビゲーション">
+        <ul class="menu__list">
+          <li><a href="#about"><span class="menu__jp">私たちについて</span><span class="menu__en">About</span></a></li>
+          <li><a href="#service"><span class="menu__jp">サービス</span><span class="menu__en">Service</span></a></li>
+          <li><a href="#process"><span class="menu__jp">進め方</span><span class="menu__en">Process</span></a></li>
+          <li><a href="#works"><span class="menu__jp">実績</span><span class="menu__en">Works</span></a></li>
+          <li><a href="#company"><span class="menu__jp">会社概要</span><span class="menu__en">Company</span></a></li>
+          <li><a href="#contact"><span class="menu__jp">お問い合わせ</span><span class="menu__en">Contact</span></a></li>
+        </ul>
+      </nav>
+      <p class="menu__foot">株式会社SD ／ SD Inc.</p>
+    </div>
+
+    <ol class="indicator" id="indicator" aria-hidden="true">
+      <li><button type="button" data-target="#hero"><span>Top</span></button></li>
+      <li><button type="button" data-target="#about"><span>About</span></button></li>
+      <li><button type="button" data-target="#service"><span>Service</span></button></li>
+      <li><button type="button" data-target="#process"><span>Process</span></button></li>
+      <li><button type="button" data-target="#works"><span>Works</span></button></li>
+      <li><button type="button" data-target="#company"><span>Company</span></button></li>
+      <li><button type="button" data-target="#contact"><span>Contact</span></button></li>
+    </ol>
+
+    <main id="main" class="main">
+      <!-- 01 HERO -->
+      <section class="section section--hero scrim-c" id="hero" data-section="hero">
+        <div class="container hero">
+          <div class="hero__inner" id="hero-inner">
+            <p class="label hero__label" data-reveal="block">SD — WEB PRODUCTION STUDIO</p>
+            <h1 class="hero__title" data-reveal="lines">
+              <span class="line"><span>構造が、</span></span>
+              <span class="line"><span>動き出す。</span></span>
+            </h1>
+            <p class="hero__en" data-reveal="block">Structure in motion.</p>
+            <p class="hero__lead" data-reveal="block">
+              株式会社SDは、Webサイトの構造・動き・コードをひとつのデザインとして扱う、小さな制作スタジオです。
+            </p>
+            <div class="hero__cta" data-reveal="block">
+              <a class="btn btn--signal" href="#contact">相談する</a>
+              <a class="link-arrow" href="#works">実績を見る</a>
+            </div>
+          </div>
+          <a class="scroll-hint" id="scroll-hint" href="#about" aria-label="スクロールして続きを見る">
+            <span class="scroll-hint__label">SCROLL</span>
+            <span class="scroll-hint__line"></span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 02 ABOUT -->
+      <section class="section section--about scrim-l" id="about" data-section="about">
+        <div class="container grid">
+          <div class="about__head col-6">
+            <p class="label" data-reveal="block">01 — ABOUT</p>
+            <h2 class="h2" data-reveal="lines">
+              <span class="line"><span>設計から、動きまで。</span></span>
+              <span class="line"><span>同じ手で。</span></span>
+            </h2>
+            <hr class="rule" data-reveal="rule" />
+          </div>
+          <div class="about__body col-5">
+            <p data-reveal="block">
+              Webサイトの品質は、見た目の美しさだけでは決まりません。情報がどう組み立てられているか、動きが何を伝えているか、コードがどれだけ速く正確に動くか。その三つが噛み合ったとき、はじめて "つくりの良い" サイトになります。
+            </p>
+            <p data-reveal="block">
+              私たちは、企画・情報設計からデザイン、フロントエンド実装、公開後の運用までを、少人数で一貫して手がけます。工程を分断しないから、設計の意図がそのまま実装に届き、公開後の改善も同じ理解の上で進められます。
+            </p>
+            <p data-reveal="block">
+              小さなスタジオです。だからこそ、一件ごとに時間をかけ、「なぜそうなっているか」をすべて説明できる状態で納品します。
+            </p>
+            <ul class="keywords" data-reveal="keywords">
+              <li>構造から考える</li>
+              <li>動きに意味を持たせる</li>
+              <li>コードまで責任を持つ</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 SERVICE -->
+      <section class="section section--service scrim-l" id="service" data-section="service">
+        <div class="pin-wrap">
+          <div class="container grid">
+            <div class="service__inner col-6">
+              <p class="label" data-reveal="block">02 — SERVICE</p>
+              <h2 class="h2" data-reveal="lines">
+                <span class="line"><span>Web制作事業</span></span>
+              </h2>
+              <p class="lead" data-reveal="block">
+                コーポレートサイト、サービスサイト、ブランドサイト。目的に応じて、構造・デザイン・実装・運用を一体で設計します。
+              </p>
+              <ol class="cards" id="service-cards">
+                <li class="card">
+                  <span class="card__index">01</span>
+                  <div class="card__body">
+                    <h3 class="h3">企画・情報設計</h3>
+                    <p>事業の目的とユーザーの行動を整理し、サイトの構造と動線を設計します。ワイヤーフレームと仕様書で、つくる前に全体を共有します。</p>
+                  </div>
+                </li>
+                <li class="card">
+                  <span class="card__index">02</span>
+                  <div class="card__body">
+                    <h3 class="h3">UI・ビジュアルデザイン</h3>
+                    <p>構造に沿って、画面とビジュアルを設計します。装飾ではなく、情報の優先順位が伝わるデザインを目指します。</p>
+                  </div>
+                </li>
+                <li class="card">
+                  <span class="card__index">03</span>
+                  <div class="card__body">
+                    <h3 class="h3">フロントエンド実装・3D／モーション</h3>
+                    <p>設計とデザインを、速く正確に動くコードに落とし込みます。WebGL（Three.js）やスクロール連動のモーションも、意味のある範囲で実装します。</p>
+                  </div>
+                </li>
+                <li class="card">
+                  <span class="card__index">04</span>
+                  <div class="card__body">
+                    <h3 class="h3">公開後の運用・改善</h3>
+                    <p>公開して終わりにしません。アクセス解析と対話をもとに、コンテンツの更新や小さな改修を継続的に行います。</p>
+                  </div>
+                </li>
+              </ol>
+              <p class="service__cta" data-reveal="block">
+                この四つを、ひとつのチームで。<a class="link-arrow" href="#contact">相談する</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 PROCESS -->
+      <section class="section section--process scrim-l" id="process" data-section="process">
+        <div class="pin-wrap">
+          <div class="container grid">
+            <div class="process__inner col-5">
+              <p class="label" data-reveal="block">03 — PROCESS</p>
+              <h2 class="h2" data-reveal="lines">
+                <span class="line"><span>五つの工程で、</span></span>
+                <span class="line"><span>一貫して。</span></span>
+              </h2>
+              <p class="lead" data-reveal="block">
+                すべての工程を同じチームが担当します。各段階で成果物を共有し、認識を揃えてから次に進みます。
+              </p>
+              <ol class="steps" id="process-steps">
+                <li class="step">
+                  <span class="step__index">01</span>
+                  <div class="step__body">
+                    <h3 class="h3">ヒアリング</h3>
+                    <p>目的、対象、現状の課題、予算と期間を伺い、つくるべきものの輪郭を決めます。</p>
+                  </div>
+                </li>
+                <li class="step">
+                  <span class="step__index">02</span>
+                  <div class="step__body">
+                    <h3 class="h3">情報設計</h3>
+                    <p>サイト構造・動線・ページ仕様をワイヤーフレームにまとめ、合意してから先に進みます。</p>
+                  </div>
+                </li>
+                <li class="step">
+                  <span class="step__index">03</span>
+                  <div class="step__body">
+                    <h3 class="h3">デザイン</h3>
+                    <p>構造に沿ってビジュアルとモーションを設計し、主要画面のデザインカンプで確認いただきます。</p>
+                  </div>
+                </li>
+                <li class="step">
+                  <span class="step__index">04</span>
+                  <div class="step__body">
+                    <h3 class="h3">実装</h3>
+                    <p>表示速度・アクセシビリティ・保守性を確保しながら実装し、実機で検証します。</p>
+                  </div>
+                </li>
+                <li class="step">
+                  <span class="step__index">05</span>
+                  <div class="step__body">
+                    <h3 class="h3">公開・運用</h3>
+                    <p>公開後の計測環境を整え、データと対話をもとに改善を続けます。</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 WORKS -->
+      <section class="section section--works" id="works" data-section="works">
+        <div class="container">
+          <div class="works__head">
+            <p class="label" data-reveal="block">04 — WORKS</p>
+            <h2 class="h2" data-reveal="lines">
+              <span class="line"><span>実績</span></span>
+            </h2>
+            <p class="lead" data-reveal="block">これまでに手がけたWebサイトの一部をご紹介します。</p>
+            <p class="note" data-reveal="block">※以下はサンプル表示です。公開時に実案件へ差し替えます。</p>
+          </div>
+          <ul class="works" id="works-list">
+            <li class="work" data-reveal="card">
+              <div class="work__thumb work__thumb--1"><span class="work__mark">01</span></div>
+              <p class="work__cat">CORPORATE</p>
+              <h3 class="h3">〔サンプル〕製造業 コーポレートサイト</h3>
+              <p>製品情報の構造を整理し、問い合わせまでの動線を再設計。</p>
+            </li>
+            <li class="work" data-reveal="card">
+              <div class="work__thumb work__thumb--2"><span class="work__mark">02</span></div>
+              <p class="work__cat">SERVICE</p>
+              <h3 class="h3">〔サンプル〕SaaS サービスサイト</h3>
+              <p>機能説明にスクロール連動のモーションを用い、理解を助ける構成に。</p>
+            </li>
+            <li class="work" data-reveal="card">
+              <div class="work__thumb work__thumb--3"><span class="work__mark">03</span></div>
+              <p class="work__cat">BRAND</p>
+              <h3 class="h3">〔サンプル〕ブランドサイト</h3>
+              <p>WebGLによる抽象的なビジュアルで、ブランドの世界観を表現。</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 06 COMPANY -->
+      <section class="section section--company scrim-r" id="company" data-section="company">
+        <div class="container grid">
+          <div class="company__inner col-6 col-start-7">
+            <p class="label" data-reveal="block">05 — COMPANY</p>
+            <h2 class="h2" data-reveal="lines">
+              <span class="line"><span>会社概要</span></span>
+            </h2>
+            <table class="company-table" id="company-table">
+              <tbody>
+                <tr data-reveal="row"><th scope="row">社名</th><td>株式会社SD（SD Inc.）</td></tr>
+                <tr data-reveal="row"><th scope="row">事業内容</th><td>Web制作事業（Webサイトの企画・設計・デザイン・開発・運用）</td></tr>
+                <tr data-reveal="row"><th scope="row">所在地</th><td>〒000-0000 東京都○○区○○ 1-2-3</td></tr>
+                <tr data-reveal="row"><th scope="row">代表者</th><td>代表取締役 ○○ ○○</td></tr>
+                <tr data-reveal="row"><th scope="row">設立</th><td>20○○年○月</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 CONTACT -->
+      <section class="section section--contact scrim-c" id="contact" data-section="contact">
+        <div class="container contact">
+          <p class="label" data-reveal="block">06 — CONTACT</p>
+          <h2 class="h2 h2--center" data-reveal="lines">
+            <span class="line"><span>まずは、お話から。</span></span>
+          </h2>
+          <p class="lead contact__lead" data-reveal="block">
+            まだ要件が固まっていなくても、ご相談ください。目的を伺い、必要な構造と進め方を一緒に考えます。<br />
+            ご返信には2〜3営業日いただく場合があります。
+          </p>
+          <div class="contact__cta" data-reveal="block">
+            <a class="btn btn--signal btn--lg" href="mailto:info@example.com">メールで相談する</a>
+            <a class="contact__mail" href="mailto:info@example.com">info@example.com</a>
+          </div>
+          <p class="note" data-reveal="block">見積・期間のご相談、既存サイトの改善相談も承ります。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <span class="wordmark wordmark--sm">SD</span>
+          <span class="footer__name">株式会社SD ／ SD Inc.</span>
+        </div>
+        <ul class="footer__nav">
+          <li><a href="#about">About</a></li>
+          <li><a href="#service">Service</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#works">Works</a></li>
+          <li><a href="#company">Company</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="footer__meta">
+          <small>© 2026 SD Inc. All rights reserved.</small>
+          <a class="footer__top" href="#top">TOP ↑</a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

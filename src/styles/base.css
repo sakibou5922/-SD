@@ -1,0 +1,115 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: var(--sd-bg);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--sd-bg);
+  color: var(--sd-text);
+  font-family: var(--sd-font-jp);
+  font-size: var(--sd-fs-body);
+  line-height: var(--sd-lh-body);
+  letter-spacing: var(--sd-ls-jp);
+  font-feature-settings: "palt";
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, p, ul, ol, table { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img, svg { display: block; max-width: 100%; }
+hr { border: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--sd-primary);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 50;
+  padding: 0.5rem 0.9rem;
+  background: var(--sd-surface); color: var(--sd-text);
+  border: 1px solid var(--sd-line);
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
+/* ---------- Background & canvas ---------- */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(120% 90% at var(--bg-x) var(--bg-y), var(--bg-c) 0%, var(--sd-bg) 62%),
+    var(--sd-bg);
+  pointer-events: none;
+}
+.bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(90% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.42) 100%);
+}
+.bg-fallback {
+  position: absolute; inset: 0; display: none; opacity: 0.18;
+  background-image:
+    radial-gradient(circle at 20% 30%, #f2f4f7 0.6px, transparent 1.2px),
+    radial-gradient(circle at 70% 60%, #5ee1c5 0.6px, transparent 1.2px),
+    radial-gradient(circle at 45% 80%, #f2f4f7 0.5px, transparent 1px),
+    radial-gradient(circle at 85% 15%, #d4a65a 0.5px, transparent 1px);
+  background-size: 140px 140px, 220px 220px, 90px 90px, 300px 300px;
+}
+html[data-webgl="0"] .bg-fallback { display: block; }
+
+.scene {
+  position: fixed; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  display: block;
+  touch-action: pan-y;
+  pointer-events: none;
+}
+html[data-webgl="0"] .scene { display: none; }
+
+.main { position: relative; z-index: 2; }
+.footer { position: relative; z-index: 2; }
+
+/* ---------- Typography helpers ---------- */
+.label {
+  font-family: var(--sd-font-mono);
+  font-size: var(--sd-fs-label);
+  letter-spacing: var(--sd-ls-label);
+  text-transform: uppercase;
+  color: var(--sd-secondary);
+}
+.h2 {
+  font-family: var(--sd-font-jp);
+  font-weight: 700;
+  font-size: var(--sd-fs-h2);
+  line-height: var(--sd-lh-heading);
+  letter-spacing: 0.02em;
+}
+.h2--center { text-align: center; }
+.h3 {
+  font-weight: 700;
+  font-size: var(--sd-fs-h3);
+  line-height: var(--sd-lh-heading);
+}
+.lead {
+  font-size: var(--sd-fs-body-lg);
+  color: var(--sd-text);
+  max-width: 40em;
+}
+.note {
+  font-size: var(--sd-fs-small);
+  color: var(--sd-text-2);
+}
+
+/* Line-split headings: each .line clips its inner span */
+.line { display: block; overflow: hidden; }
+.line > span { display: block; }

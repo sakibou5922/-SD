@@ -1,0 +1,72 @@
+:root {
+  color-scheme: dark;
+
+  /* Base (Brand Guardian §3.1) */
+  --sd-bg: #0b0e14;
+  --sd-bg-deep: #070910;
+  --sd-bg-2: #141a26;
+  --sd-bg-2-warm: #1a1712;
+  --sd-surface: #131822;
+  --sd-surface-2: #1b2230;
+  --sd-line: #273043;
+
+  /* Text */
+  --sd-text: #f2f4f7;
+  --sd-text-2: #9aa3b2;
+  --sd-text-3: #6b7484;
+
+  /* Accent */
+  --sd-primary: #5ee1c5;
+  --sd-secondary: #d4a65a;
+  --sd-signal: #ff6b4a;
+  --sd-signal-text: #0b0e14;
+
+  /* Fonts */
+  --sd-font-jp: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  --sd-font-latin: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --sd-font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale (base 16px, ratio 1.25, fluid) */
+  --sd-fs-display: clamp(2.5rem, 6vw, 5rem);
+  --sd-fs-h1: clamp(2rem, 4vw, 3.125rem);
+  --sd-fs-h2: clamp(1.5rem, 2.6vw, 2rem);
+  --sd-fs-h3: 1.25rem;
+  --sd-fs-body: 1rem;
+  --sd-fs-body-lg: 1.125rem;
+  --sd-fs-small: 0.875rem;
+  --sd-fs-label: 0.75rem;
+
+  --sd-lh-display: 1.15;
+  --sd-lh-heading: 1.35;
+  --sd-lh-body: 1.9;
+  --sd-ls-jp: 0.04em;
+  --sd-ls-label: 0.12em;
+
+  /* Layout */
+  --container: 1280px;
+  --gutter: 16px;
+  --header-h: 64px;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-ui: 0.28s;
+
+  /* Background driver (tweened by GSAP) */
+  --bg-x: 50%;
+  --bg-y: 60%;
+  --bg-c: #141a26;
+}
+
+@media (min-width: 768px) {
+  :root { --gutter: 32px; }
+}
+@media (min-width: 1024px) {
+  :root { --gutter: 48px; --header-h: 72px; }
+}
