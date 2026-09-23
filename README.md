@@ -40,7 +40,8 @@ docs/ui-review.md          実装後のレビュー（UI Finish-Gate Reviewer）
 
 - `index.html` の会社概要（所在地・代表者・設立）とメールアドレス `info@example.com`
 - Works の 3 件のサンプルカード（`〔サンプル〕`）と注記
-- OG 画像（`docs/brand-brief.md` §5.10 の仕様）
+- OG 画像 `public/og.png`（1200×630）。現在はヘッドレス環境の代替フォントで生成した仮画像です。公開時は `og:image` を絶対 URL（例 `https://example.com/og.png`）に書き換え、必要なら本番フォントで撮り直してください
+- `public/robots.txt` の Sitemap 行（公開ドメインに合わせる）
 
 ## デプロイ
 
