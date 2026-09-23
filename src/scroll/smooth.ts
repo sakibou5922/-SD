@@ -36,10 +36,15 @@ export function createSmoothScroll(enabled: boolean): Smooth {
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
+  // pins change the document height; keep Lenis' scroll limit in sync with ScrollTrigger
+  ScrollTrigger.addEventListener('refresh', () => lenis.resize());
 
   return {
     lenis,
     scrollTo(target, opts) {
+      // Lenis clamps targets to a cached limit that is refreshed asynchronously (ResizeObserver);
+      // recompute it synchronously so a jump right after layout changes (hash landing) is exact.
+      lenis.resize();
       lenis.scrollTo(target, {
         offset: headerOffset(),
         duration: 1.2,

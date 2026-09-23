@@ -14,6 +14,8 @@ export function setupHeader(smooth: Smooth): HeaderController {
   /* scrolled / hidden states */
   let lastY = window.scrollY;
   let ticking = false;
+  /** while > now, programmatic (anchor) scrolling must not hide the header */
+  let keepVisibleUntil = 0;
   const update = () => {
     ticking = false;
     const y = window.scrollY;
@@ -21,7 +23,7 @@ export function setupHeader(smooth: Smooth): HeaderController {
     const inHero = y < window.innerHeight * 0.9;
     const goingDown = y > lastY + 4;
     const goingUp = y < lastY - 4;
-    if (inHero || menu.classList.contains('is-open')) header.classList.remove('is-hidden');
+    if (inHero || menu.classList.contains('is-open') || performance.now() < keepVisibleUntil) header.classList.remove('is-hidden');
     else if (goingDown) header.classList.add('is-hidden');
     else if (goingUp) header.classList.remove('is-hidden');
     lastY = y;
@@ -45,6 +47,8 @@ export function setupHeader(smooth: Smooth): HeaderController {
       return;
     }
     if (!document.querySelector(href)) return;
+    keepVisibleUntil = performance.now() + 1600;
+    header.classList.remove('is-hidden');
     smooth.scrollTo(href);
     history.replaceState(null, '', href);
   });
