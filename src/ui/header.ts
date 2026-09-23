@@ -2,6 +2,8 @@ import type { Smooth } from '../scroll/smooth';
 
 export type HeaderController = {
   setActive(id: string): void;
+  /** keep the header on screen for a while (programmatic jumps must not hide it) */
+  keepVisible(ms?: number): void;
 };
 
 export function setupHeader(smooth: Smooth): HeaderController {
@@ -94,6 +96,11 @@ export function setupHeader(smooth: Smooth): HeaderController {
   window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) closeMenu(); });
 
   return {
+    keepVisible(ms = 1600) {
+      keepVisibleUntil = performance.now() + ms;
+      header.classList.remove('is-hidden');
+      lastY = window.scrollY;
+    },
     setActive(id) {
       for (const a of navLinks) {
         if (a.dataset.section === id) a.setAttribute('aria-current', 'location');

@@ -105,7 +105,7 @@ void main() {
   // galaxy ramp (only while the T0 target dominates): warm core → cyan arms → violet rim
   vec3 gcol = mix(uGalCore, uGalArm, smoothstep(0.0, 0.45, aGal));
   gcol = mix(gcol, uGalRim, smoothstep(0.6, 1.0, aGal));
-  gcol *= 1.0 + 0.7 * (1.0 - smoothstep(0.0, 0.3, aGal));
+  gcol *= 1.0 + 0.35 * (1.0 - smoothstep(0.0, 0.3, aGal));
   col = mix(col, gcol, uW[0]);
   vColor = col;
 
@@ -117,7 +117,7 @@ void main() {
     vAlpha *= 0.9;
   #else
     float core = uW[0] * (1.0 - smoothstep(0.0, 0.25, aGal));
-    gl_PointSize = uPointSize * uSizeMul * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (1.0 + 0.7 * core) * (6.0 / d);
+    gl_PointSize = uPointSize * uSizeMul * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (1.0 + 0.4 * core) * (6.0 / d);
   #endif
   gl_Position = projectionMatrix * mv;
 }

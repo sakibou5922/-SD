@@ -6,6 +6,8 @@ import { createScene, hasWebGL, type SceneController } from './three/scene';
 import { sceneState, REDUCED_STATE } from './three/state';
 import { setupHeader } from './ui/header';
 import { setupIndicator } from './ui/indicator';
+import { setupCursor } from './ui/cursor';
+import { splitChars, setupProgress, setupSectionNumerals, setupTilt, runPreloader } from './ui/effects';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // point count / DPR are chosen once at load; scroll timelines are rebuilt per breakpoint below
@@ -69,11 +71,18 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 updateActive();
 
+const heroChars = splitChars(document.getElementById('hero-title')!);
+setupProgress();
+setupSectionNumerals(reduced);
+setupTilt();
+setupCursor();
+
 if (reduced) {
   Object.assign(sceneState, REDUCED_STATE);
   scene?.renderOnce();
   setupReveals(document, true);
   gsap.set('#hero-inner, #scroll-hint', { opacity: 1 });
+  void runPreloader(true);
 } else {
   // gsap.matchMedia reverts every tween / ScrollTrigger made inside when a breakpoint is crossed
   const mm = gsap.matchMedia();
@@ -85,8 +94,11 @@ if (reduced) {
     },
   );
   setupReveals(document, false);
-  heroIntro();
+  gsap.set(heroChars, { yPercent: 110 });
+  gsap.set('#hero [data-reveal], #scroll-hint, .header .wordmark', { opacity: 0 });
+  smooth.stop();
   scene?.start();
+  void runPreloader(false).then(() => { smooth.start(); heroIntro(); });
 }
 
 /* ---------- Hero intro (time-based, once) ---------- */
@@ -94,8 +106,9 @@ function heroIntro(): void {
   const items = gsap.utils.toArray<HTMLElement>('#hero [data-reveal]');
   const hint = document.getElementById('scroll-hint')!;
   gsap.set(hint, { opacity: 0 });
-  const tl = gsap.timeline({ defaults: { ease: 'power2.out' }, delay: 0.2 });
-  tl.fromTo('.wordmark', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0);
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' }, delay: 0.15 });
+  tl.fromTo('.header .wordmark', { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0);
+  tl.to(heroChars, { yPercent: 0, duration: 1.1, ease: 'power4.out', stagger: 0.04 }, 0.1);
   buildRevealTimeline(tl, items);
   tl.to(hint, { opacity: 1, duration: 0.8 }, '+=0.3');
   tl.call(() => {
@@ -117,7 +130,7 @@ window.addEventListener('load', () => {
   refresh();
   const hash = location.hash;
   if (hash && hash !== '#top' && document.getElementById(hash.slice(1))) {
-    requestAnimationFrame(() => smooth.scrollTo(hash, { immediate: true }));
+    requestAnimationFrame(() => { smooth.scrollTo(hash, { immediate: true }); header.keepVisible(2500); });
   }
 });
 let lastWidth = window.innerWidth;

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { buildTargets, DESKTOP, MOBILE, type TargetSet } from './targets';
 import { POINTS_VERT, POINTS_FRAG, FRESNEL_VERT, FRESNEL_FRAG } from './shaders';
 import { sceneState as S } from './state';
+import { createBackground } from './background';
+import { createPost, type Post } from './post';
 
 THREE.ColorManagement.enabled = false;
 
@@ -34,7 +36,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   try {
     renderer = new THREE.WebGLRenderer({
       canvas,
-      alpha: true,
+      alpha: false,
       antialias: false,
       powerPreference: 'high-performance',
       premultipliedAlpha: true,
@@ -45,13 +47,25 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   const maxDpr = opts.isMobile ? 1.5 : 2;
   let dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
   renderer.setPixelRatio(dpr);
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(0x080b1c, 1);
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(S.fov, window.innerWidth / window.innerHeight, 0.1, 40);
   const group = new THREE.Group();
   scene.add(group);
+
+  /* background (gradient, nebulae, distant stars) drawn in-scene so post-processing covers it */
+  const bgLayer = createBackground();
+  scene.add(bgLayer.mesh);
+  const BG_INDIGO = new THREE.Color('#141b3a'), BG_AMBER = new THREE.Color('#2a1638');
+  const bgTmp = new THREE.Color();
+
+  /* post-processing: bloom + grade on desktop; direct render on mobile */
+  let post: Post | null = null;
+  if (!opts.isMobile) {
+    try { post = createPost(renderer, scene, camera); } catch { post = null; }
+  }
 
   /* ---------- geometry ---------- */
   const targets: TargetSet = buildTargets(opts.isMobile ? MOBILE : DESKTOP);
@@ -114,7 +128,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       premultipliedAlpha: true,
     });
   const pointsMat = mkMaterial({}, 1);
-  const glowMat = mkMaterial({}, 0.12, 3); // halo pass: 3x size, 12% alpha
+  const glowMat = mkMaterial({}, opts.isMobile ? 0.12 : 0.06, 3); // halo pass: 3x size (bloom adds the rest on desktop)
   const lineMat = mkMaterial({ LINE: '' }, 1);
 
   const points = new THREE.Points(geo, pointsMat);
@@ -157,9 +171,9 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
 
   /* Contact: a light travelling along the ring (T6 geometry: R 2.6, tilted 18°) */
   const orbitMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#e8f6ff'), transparent: true, opacity: 0, depthWrite: false });
-  const orbitMesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), orbitMat);
+  const orbitMesh = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), orbitMat);
   const orbitGlowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#8ad8ff'), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-  const orbitGlow = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 12), orbitGlowMat);
+  const orbitGlow = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12), orbitGlowMat);
   orbitMesh.add(orbitGlow);
   orbitMesh.visible = false;
   group.add(orbitMesh);
@@ -231,13 +245,18 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     planetMesh.rotation.y = time * 0.05;
     // orbiting light: ring param → tilt 18° about X (matches the T6 target)
     orbitMesh.visible = S.orbitOpacity > 0.002;
-    orbitMat.opacity = S.orbitOpacity;
-    orbitGlowMat.opacity = S.orbitOpacity * 0.35;
+    orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 1 : 0.8);
+    orbitGlowMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.35 : 0.12);
     {
       const a = time * 0.45, R = 2.6, tilt = (18 * Math.PI) / 180;
       const x = R * Math.cos(a), z = R * Math.sin(a);
       orbitMesh.position.set(x, -z * Math.sin(tilt), z * Math.cos(tilt));
     }
+    bgLayer.uniforms.uTime.value = time;
+    bgLayer.uniforms.uBgPos.value.set(S.bgX, 1 - S.bgY);
+    bgTmp.lerpColors(BG_INDIGO, BG_AMBER, S.bgWarm);
+    (bgLayer.uniforms.uBgC.value as THREE.Color).copy(bgTmp);
+    if (post) post.grade.uniforms.uTime.value = time;
     farGroup.visible = S.farOpacity > 0.002;
     farMat.uniforms.uOpacity.value = S.farOpacity;
     farRingMat.opacity = S.farOpacity * 0.45;
@@ -260,7 +279,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   };
 
   const render = () => {
-    renderer.render(scene, camera);
+    if (post) post.composer.render(); else renderer.render(scene, camera);
   };
 
   const setDpr = (v: number) => {
@@ -268,7 +287,13 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     renderer.setPixelRatio(dpr);
     uniforms.uDpr.value = dpr;
     renderer.setSize(window.innerWidth, window.innerHeight, false);
+    post?.setPixelRatio(dpr);
+    post?.setSize(window.innerWidth, window.innerHeight);
+    bgLayer.uniforms.uRes.value.set(window.innerWidth * dpr, window.innerHeight * dpr);
   };
+  post?.setPixelRatio(dpr);
+  post?.setSize(window.innerWidth, window.innerHeight);
+  bgLayer.uniforms.uRes.value.set(window.innerWidth * dpr, window.innerHeight * dpr);
 
   let skip = false;
   const loop = (now: number) => {
@@ -314,6 +339,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight, false);
+      post?.setSize(window.innerWidth, window.innerHeight);
+      bgLayer.uniforms.uRes.value.set(window.innerWidth * dpr, window.innerHeight * dpr);
       if (!running) renderOnce();
     }, 150);
   };
@@ -341,6 +368,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     planetMat.dispose(); orbitMat.dispose(); orbitGlowMat.dispose(); farMat.dispose(); farRingMat.dispose();
     knotMesh.geometry.dispose(); slabMesh.geometry.dispose(); planetMesh.geometry.dispose();
     orbitMesh.geometry.dispose(); orbitGlow.geometry.dispose(); farPlanet.geometry.dispose(); farRing.geometry.dispose();
+    post?.dispose();
+    (bgLayer.mesh.material as THREE.Material).dispose(); bgLayer.mesh.geometry.dispose();
     renderer.dispose();
   };
 

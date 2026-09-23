@@ -102,3 +102,8 @@
   .card { opacity: 1; }
   .card::before { transform: none; }
 }
+
+/* ---------- Hero character reveal ---------- */
+.hero__title .char { display: inline-block; overflow: hidden; vertical-align: top; }
+.hero__title .char > span { display: inline-block; will-change: transform; }
+.hero__en { letter-spacing: 0.12em; text-transform: uppercase; font-size: clamp(0.8125rem, 1.1vw, 0.9375rem); }

@@ -27,6 +27,8 @@ export const sceneState = {
   orbitOpacity: 0,
   /** Hero: small ringed planet in the far background */
   farOpacity: 1,
+  /** background glow centre (0–1 screen space) and warm tint (0 = indigo, 1 = amber) */
+  bgX: 0.5, bgY: 0.6, bgWarm: 0,
   camX: 0, camY: 4.2, camZ: 8.0,
   tX: 0, tY: 0, tZ: 0,
   fov: 42,

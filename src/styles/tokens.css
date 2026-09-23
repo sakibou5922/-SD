@@ -27,7 +27,7 @@
   --sd-font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
 
   /* Type scale (base 16px, ratio 1.25, fluid) */
-  --sd-fs-display: clamp(2.5rem, 6vw, 5rem);
+  --sd-fs-display: clamp(2.75rem, 7.4vw, 6.75rem);
   --sd-fs-h1: clamp(2rem, 4vw, 3.125rem);
   --sd-fs-h2: clamp(1.5rem, 2.6vw, 2rem);
   --sd-fs-h3: 1.25rem;
@@ -36,7 +36,7 @@
   --sd-fs-small: 0.875rem;
   --sd-fs-label: 0.75rem;
 
-  --sd-lh-display: 1.15;
+  --sd-lh-display: 1.06;
   --sd-lh-heading: 1.35;
   --sd-lh-body: 1.9;
   --sd-ls-jp: 0.04em;

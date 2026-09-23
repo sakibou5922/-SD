@@ -26,9 +26,17 @@ const at = (p: number) => Math.max(p, EPS);
 function seg(tl: gsap.core.Timeline, start: number, end: number, from: Partial3D, to: Partial3D): void {
   tl.fromTo(S, from, { ...to, duration: end - at(start), ease: 'none', immediateRender: false }, at(start));
 }
-/** background driver: CSS custom properties on <html> */
+/** background driver: CSS custom properties on <html> (fallback) + numeric state for the shader */
 function bg(tl: gsap.core.Timeline, start: number, end: number, from: Record<string, string>, to: Record<string, string>): void {
   tl.fromTo(root, from, { ...to, duration: end - at(start), ease: 'none', immediateRender: false }, at(start));
+  const num = (v: Record<string, string>): Partial3D => {
+    const o: Partial3D = {};
+    if (v['--bg-x']) o.bgX = parseFloat(v['--bg-x']) / 100;
+    if (v['--bg-y']) o.bgY = parseFloat(v['--bg-y']) / 100;
+    if (v['--bg-c']) o.bgWarm = v['--bg-c'].toLowerCase() === '#2a1638' ? 1 : 0;
+    return o;
+  };
+  seg(tl, start, end, num(from), num(to));
 }
 
 /** Unpinned list items: plain per-element entrance, always fully readable once on screen. */
@@ -61,7 +69,7 @@ export function setupSections(o: SectionsOptions): () => void {
   const tls: gsap.core.Timeline[] = [];
   // lookAt x offsets: negative moves the object to the right of the screen (beside left-aligned text)
   const X_ABOUT = -1.1 * o.shift, X_SERVICE = -1.9 * o.shift, X_PROCESS = -1.5 * o.shift;
-  const X_WORKS = 0, X_COMPANY = 1.2 * o.shift, X_CONTACT = 0;
+  const X_WORKS = 0, X_COMPANY = 1.9 * o.shift, X_CONTACT = 0;
 
   /* ---------- 1. Hero — 点 ---------- */
   {
@@ -79,10 +87,10 @@ export function setupSections(o: SectionsOptions): () => void {
   /* ---------- 2. About — 核 ---------- */
   {
     const tl = sectionTimeline('about');
-    seg(tl, 0, 0.35, { w0: 0.6, w1: 0.4, noise: 0.12, accentMix: 0.1 }, { w0: 0, w1: 1, noise: 0.08, accentMix: 0.25 });
-    seg(tl, 0, 0.4, { camX: 0.4, camY: 2.6, camZ: 7.4, tX: 0 }, { camX: 1.2, camY: 0.6, camZ: 6.5, tX: X_ABOUT });
+    seg(tl, 0, 0.2, { w0: 0.6, w1: 0.4, noise: 0.12, accentMix: 0.1 }, { w0: 0, w1: 1, noise: 0.08, accentMix: 0.25 });
+    seg(tl, 0, 0.25, { camX: 0.4, camY: 2.6, camZ: 7.4, tX: 0 }, { camX: 1.2, camY: 0.6, camZ: 6.5, tX: X_ABOUT });
     seg(tl, 0, 1, { rotY: 0 }, { rotY: 0.4 });
-    seg(tl, 0.12, 0.4, { planetOpacity: 0 }, { planetOpacity: 0.85 });
+    seg(tl, 0.05, 0.25, { planetOpacity: 0 }, { planetOpacity: 0.85 });
     seg(tl, 0.8, 1, { planetOpacity: 0.85 }, { planetOpacity: 0 });
     bg(tl, 0, 0.4, { '--bg-x': '50%', '--bg-y': '60%' }, { '--bg-x': '62%', '--bg-y': '45%' });
     seg(tl, 0.8, 1, { w1: 1, w2: 0 }, { w1: 0.5, w2: 0.5 });
@@ -146,27 +154,30 @@ export function setupSections(o: SectionsOptions): () => void {
 
   /* ---------- 5. Works — 完成形 ---------- */
   {
-    const tl = sectionTimeline('works');
-    seg(tl, 0, 0.3, { knotOpacity: 0, pointSize: 2.0, lineOpacity: 0.35, accentMix: 0.25, colorMix: 0.5 }, { knotOpacity: 0.55, pointSize: 1.6, lineOpacity: 0.15, accentMix: 0.6, colorMix: 1 });
-    seg(tl, 0, 0.3, { camX: 2.2, camY: 1.0, camZ: 5.2, tX: X_PROCESS, fov: 40 }, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, fov: 38 });
-    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#141b3a' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' });
-    seg(tl, 0, 1, { tY: 0 }, { tY: 0.2 });
-    // the solid fades out while the cards are still on screen (brief §3.1: glow stays a minority)
-    seg(tl, 0.6, 0.8, { knotOpacity: 0.55 }, { knotOpacity: 0 });
+    // starts while the section is entering (20vh after the Process pin releases)
+    const tl = sectionTimeline('works', { start: 'top 80%' });
+    seg(tl, 0, 0.25, { knotOpacity: 0, pointSize: 2.0, lineOpacity: 0.35, accentMix: 0.25, colorMix: 0.5 }, { knotOpacity: 0.55, pointSize: 1.6, lineOpacity: 0.15, accentMix: 0.6, colorMix: 1 });
+    seg(tl, 0, 0.25, { camX: 2.2, camY: 1.0, camZ: 5.2, tX: X_PROCESS, fov: 40 }, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, fov: 38 });
+    bg(tl, 0, 0.25, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#141b3a' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' });
+    seg(tl, 0, 0.7, { tY: 0 }, { tY: 0.2 });
+    // the solid fades while the cards are still on screen (brief §3.1: glow stays a minority)
+    seg(tl, 0.55, 0.72, { knotOpacity: 0.55 }, { knotOpacity: 0 });
     // lines fade before the slab morph: the knot index set would draw random long lines on the slab
-    seg(tl, 0.7, 0.85, { lineOpacity: 0.15 }, { lineOpacity: 0 });
-    seg(tl, 0.85, 1, { w4: 1, w5: 0 }, { w4: 0.5, w5: 0.5 });
+    seg(tl, 0.62, 0.76, { lineOpacity: 0.15 }, { lineOpacity: 0 });
+    // knot → slab hand-off completes as the Company heading enters
+    seg(tl, 0.74, 1, { w4: 1, w5: 0, noise: 0.06, accentMix: 0.6, colorMix: 1, rotX: 0.5, breath: 0.03 },
+      { w4: 0, w5: 1, noise: 0.02, accentMix: 0.15, colorMix: 0.3, rotX: 0, breath: 0.012 });
+    seg(tl, 0.74, 1, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, tY: 0.2, fov: 38 }, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, fov: 42 });
+    bg(tl, 0.74, 1, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#141b3a' });
+    seg(tl, 0.86, 1, { slabOpacity: 0 }, { slabOpacity: 0.8 });
     tls.push(tl);
   }
 
   /* ---------- 6. Company — 礎 ---------- */
   {
+    // the slab is already complete here; only the idle rotation settles (礎は動かない)
     const tl = sectionTimeline('company');
-    seg(tl, 0, 0.3, { w4: 0.5, w5: 0.5, noise: 0.06, accentMix: 0.6, idleSpeed: 0.04, colorMix: 1, rotX: 0.5, breath: 0.03 },
-      { w4: 0, w5: 1, noise: 0.02, accentMix: 0.15, idleSpeed: 0.01, colorMix: 0.3, rotX: 0, breath: 0.012 });
-    seg(tl, 0.15, 0.4, { slabOpacity: 0 }, { slabOpacity: 0.8 });
-    seg(tl, 0, 0.3, { camX: 0, camY: 0.3, camZ: 6.2, tX: X_WORKS, tY: 0.2, fov: 38 }, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, fov: 42 });
-    bg(tl, 0, 0.3, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a1638' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#141b3a' });
+    seg(tl, 0, 0.3, { idleSpeed: 0.04 }, { idleSpeed: 0.01 });
     tls.push(tl);
   }
 

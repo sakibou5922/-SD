@@ -33,6 +33,19 @@
   <body>
     <a class="skip-link" href="#main">本文へスキップ</a>
 
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <div class="preloader__inner">
+        <span class="wordmark wordmark--lg">SD</span>
+        <div class="preloader__bar"><span id="preloader-fill"></span></div>
+        <span class="preloader__count" id="preloader-count">000</span>
+      </div>
+    </div>
+
+    <div class="cursor" id="cursor" aria-hidden="true">
+      <div class="cursor__dot"></div>
+      <div class="cursor__ring"></div>
+    </div>
+
     <div class="bg" aria-hidden="true">
       <div class="bg-stars"></div>
       <div class="bg-fallback"></div>
@@ -56,6 +69,7 @@
         <span class="menu-btn__bar"></span>
         <span class="menu-btn__bar"></span>
       </button>
+      <span class="header__progress" id="progress" aria-hidden="true"></span>
     </header>
 
     <div class="menu" id="menu" hidden>
@@ -88,7 +102,7 @@
         <div class="container hero">
           <div class="hero__inner" id="hero-inner">
             <p class="label hero__label" data-reveal="block">SD — WEB PRODUCTION STUDIO</p>
-            <h1 class="hero__title" data-reveal="lines">
+            <h1 class="hero__title" id="hero-title">
               <span class="line"><span>構造が、</span></span>
               <span class="line"><span>動き出す。</span></span>
             </h1>
@@ -110,6 +124,7 @@
 
       <!-- 02 ABOUT -->
       <section class="section section--about scrim-l" id="about" data-section="about">
+        <span class="section-num" aria-hidden="true">01</span>
         <div class="container grid">
           <div class="about__head col-6">
             <p class="label" data-reveal="block">01 — ABOUT</p>
@@ -140,6 +155,7 @@
 
       <!-- 03 SERVICE -->
       <section class="section section--service scrim-l" id="service" data-section="service">
+        <span class="section-num" aria-hidden="true">02</span>
         <div class="pin-wrap">
           <div class="container grid">
             <div class="service__inner col-6">
@@ -190,6 +206,7 @@
 
       <!-- 04 PROCESS -->
       <section class="section section--process scrim-l" id="process" data-section="process">
+        <span class="section-num" aria-hidden="true">03</span>
         <div class="pin-wrap">
           <div class="container grid">
             <div class="process__inner col-5">
@@ -245,6 +262,7 @@
 
       <!-- 05 WORKS -->
       <section class="section section--works" id="works" data-section="works">
+        <span class="section-num" aria-hidden="true">04</span>
         <div class="container">
           <div class="works__head">
             <p class="label" data-reveal="block">04 — WORKS</p>
@@ -300,6 +318,7 @@
 
       <!-- 06 COMPANY -->
       <section class="section section--company scrim-r" id="company" data-section="company">
+        <span class="section-num" aria-hidden="true">05</span>
         <div class="container grid">
           <div class="company__inner col-6 col-start-7">
             <p class="label" data-reveal="block">05 — COMPANY</p>
@@ -321,6 +340,7 @@
 
       <!-- 07 CONTACT -->
       <section class="section section--contact scrim-c" id="contact" data-section="contact">
+        <span class="section-num" aria-hidden="true">06</span>
         <div class="container contact">
           <p class="label" data-reveal="block">06 — CONTACT</p>
           <h2 class="h2 h2--center" data-reveal="lines">
@@ -340,6 +360,7 @@
     </main>
 
     <footer class="footer" id="footer">
+      <span class="footer__big" aria-hidden="true">SD</span>
       <div class="container footer__inner">
         <div class="footer__brand">
           <span class="wordmark wordmark--sm">SD</span>

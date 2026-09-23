@@ -78,6 +78,7 @@ hr { border: 0; }
   background-size: 140px 140px, 220px 220px, 90px 90px, 300px 300px;
 }
 html[data-webgl="0"] .bg-fallback { display: block; }
+html:not([data-webgl="0"]) .bg-stars { display: none; }
 
 .scene {
   position: fixed; inset: 0; z-index: 1;
