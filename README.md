@@ -1,7 +1,9 @@
 # 株式会社SD コーポレートサイト
 
 「構造が、動き出す。」— Web制作事業を営む株式会社SDのワンページ・スクロール駆動サイトです。
-背景の 3D 点群（Three.js）がスクロールに合わせて **点 → 核 → 格子 → 設計図 → 結び目 → 礎 → 輪** と変形し、Web制作の工程を一つのオブジェクトで語ります。
+背景の 3D 点群（Three.js）がスクロールに合わせて **銀河 → 惑星 → 格子 → 設計図 → 結び目 → 礎 → 輪** と変形し、Web制作の工程を一つのオブジェクトで語ります。
+
+公開 URL: https://sakibou5922.github.io/-SD/
 
 ## 開発
 
@@ -22,13 +24,17 @@ index.html                 全セクションのマークアップ・コピー�
 src/main.ts                起動・分岐（reduced-motion / WebGL 不可 / モバイル）
 src/three/targets.ts       7 つのモーフターゲットを決定論的に生成（純関数）
 src/three/shaders.ts       点・線・フレネル用 GLSL
-src/three/scene.ts         レンダラー、共有ジオメトリ、描画ループ、適応 DPR
+src/three/background.ts    シーン内背景（グラデーション・星雲・遠景の星・ビネット）
+src/three/post.ts          ポストプロセス（ブルーム、グレイン、ビネット、色収差）
+src/three/scene.ts         レンダラー、共有ジオメトリ、惑星・軌道・遠景惑星、描画ループ、適応 DPR
 src/three/state.ts         スクロールで tween される単一のシーン状態
 src/scroll/sections.ts     セクション別 ScrollTrigger タイムライン（3D・カメラ・背景・DOM）
 src/scroll/reveal.ts       DOM 入場アニメーションの共通ユーティリティ
 src/scroll/smooth.ts       Lenis + ScrollTrigger 同期
 src/ui/header.ts           固定ヘッダー、モバイルメニュー、アンカー遷移
 src/ui/indicator.ts        セクションインジケーター
+src/ui/cursor.ts           カスタムカーソル、マグネティックボタン
+src/ui/effects.ts          プリローダー、文字分割リビール、進捗バー、セクション番号、カードのチルト
 src/styles/*.css           トークン / ベース / コンポーネント / セクション
 docs/brand-brief.md        ブランド戦略・VI・ボイス・全コピー（Brand Guardian / Content Creator）
 docs/scroll-storyboard.md  3D シーン設計・ストーリーボード・性能予算（UX Architect / Visual Storyteller）
@@ -53,7 +59,8 @@ docs/ui-review.md          実装後のレビュー（UI Finish-Gate Reviewer）
 
 - `prefers-reduced-motion: reduce` … スムーススクロールとスクロール連動の変形を停止し、3D は静止した完成形を 1 回だけ描画。DOM はフェードのみ
 - WebGL 非対応 … キャンバスを外し、CSS グラデーション + ドット模様の背景に切替
-- モバイル … 点数を 4,096 に減らし、ピン留めを解除、DPR を 1.5 に制限
+- モバイル … 点数を 4,096 に減らし、ピン留めとポストプロセスを解除、DPR を 1.5 に制限
+- カスタムカーソルとマグネティックボタンは `pointer: fine` の端末のみ
 
 ## クレジット
 
