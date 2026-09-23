@@ -46,9 +46,11 @@
 /* ---------- About ---------- */
 .section--about { min-height: 150vh; padding: var(--space-24) 0; display: flex; align-items: center; }
 .section--about .container { width: 100%; }
-.section--about .grid { align-items: start; }
+.section--about .grid { align-items: start; row-gap: var(--space-8); }
+.about__head, .about__body { grid-column: 1 / -1; }
 .about__body { display: grid; gap: var(--space-4); max-width: 40em; }
-@media (min-width: 1024px) { .about__body { grid-column: 8 / span 5; } }
+@media (min-width: 768px) { .about__head, .about__body { grid-column: 1 / span 7; } }
+@media (min-width: 1024px) { .about__head, .about__body { grid-column: 1 / span 6; } }
 
 /* ---------- Service / Process (pinned on desktop) ---------- */
 .section--service, .section--process { padding: var(--space-24) 0; }
@@ -63,17 +65,17 @@
 .service__inner .lead, .process__inner .lead { margin-top: var(--space-4); }
 
 /* ---------- Works ---------- */
-.section--works { min-height: 150vh; padding: var(--space-24) 0; display: flex; align-items: center; }
+.section--works { min-height: 120vh; padding: var(--space-24) 0; display: flex; align-items: center; }
 .section--works .container { width: 100%; }
 .works__head .lead { margin-top: var(--space-4); }
 .works__head .note { margin-top: var(--space-2); }
 
 /* ---------- Company ---------- */
-.section--company { min-height: 120vh; padding: var(--space-24) 0; display: flex; align-items: center; }
+.section--company { min-height: 110vh; padding: var(--space-24) 0; display: flex; align-items: center; }
 .section--company .container { width: 100%; }
 
 /* ---------- Contact ---------- */
-.section--contact { min-height: 100vh; padding: var(--space-24) 0; display: flex; align-items: center; }
+.section--contact { min-height: 100vh; padding: var(--space-24) 0 var(--space-16); display: flex; align-items: center; }
 .contact { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .contact__lead { margin-top: var(--space-6); }
 .contact__cta { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); margin-top: var(--space-8); }
@@ -82,6 +84,13 @@
 .contact .note { margin-top: var(--space-6); }
 .contact .label { text-align: center; }
 .contact .h2 { margin-top: var(--space-4); }
+
+/* ---------- Mobile: no dead scroll space ---------- */
+@media (max-width: 767px) {
+  .section--about, .section--works, .section--company, .section--contact { min-height: auto; padding: var(--space-16) 0; }
+  .section--contact { padding-top: var(--space-24); }
+  .section--service, .section--process { padding: var(--space-16) 0; }
+}
 
 /* ---------- Section heading rhythm ---------- */
 .label + .h2 { margin-top: var(--space-4); }

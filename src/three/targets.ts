@@ -87,9 +87,9 @@ export function buildTargets(opts: TargetOptions): TargetSet {
       let px = dx * r, py = dy * r, pz = dz * r;
       // clump into nebula-like knots
       const k = 0.35;
-      px += vnoise(px * k + 11.3, py * k, pz * k) * 1.2;
-      py += vnoise(px * k, py * k + 7.1, pz * k) * 1.2;
-      pz += vnoise(px * k, py * k, pz * k + 3.7) * 1.2;
+      px += vnoise(px * k + 11.3, py * k, pz * k) * 1.8;
+      py += vnoise(px * k, py * k + 7.1, pz * k) * 1.8;
+      pz += vnoise(px * k, py * k, pz * k + 3.7) * 1.8;
       if (i % 7 === 0) {
         const hr = 6 + rand() * 3;
         px = dx * hr; py = dy * hr; pz = dz * hr;
