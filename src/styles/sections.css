@@ -8,6 +8,7 @@
 .scrim-l::before { background: linear-gradient(90deg, rgba(8, 11, 28, 0.78) 0%, rgba(8, 11, 28, 0.55) 45%, transparent 75%); }
 .scrim-r::before { background: linear-gradient(270deg, rgba(8, 11, 28, 0.78) 0%, rgba(8, 11, 28, 0.55) 45%, transparent 75%); }
 .scrim-c::before { background: radial-gradient(60% 50% at 50% 50%, rgba(8, 11, 28, 0.7) 0%, transparent 100%); }
+.section--contact::before { background: radial-gradient(64% 56% at 50% 50%, rgba(8, 11, 28, 0.88) 0%, rgba(8, 11, 28, 0.5) 60%, transparent 100%); }
 .section--hero::before { opacity: 0.35; }
 @media (max-width: 767px) {
   .scrim-l::before, .scrim-r::before {

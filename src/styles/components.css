@@ -46,7 +46,7 @@
   font-family: var(--sd-font-jp); font-weight: 500; font-size: 0.9375rem;
   letter-spacing: 0.06em;
   border: 1px solid transparent;
-  transition: transform var(--dur-ui) var(--ease-out), background-color var(--dur-ui) var(--ease-out),
+  transition: background-color var(--dur-ui) var(--ease-out),
     color var(--dur-ui) var(--ease-out), border-color var(--dur-ui) var(--ease-out),
     box-shadow var(--dur-ui) var(--ease-out);
 }
@@ -54,7 +54,6 @@
   background: var(--sd-signal); color: var(--sd-signal-text);
 }
 .btn--signal:hover, .btn--signal:focus-visible {
-  transform: scale(1.02);
   box-shadow: 0 0 24px rgba(255, 107, 74, 0.35);
 }
 .btn--outline {
@@ -228,9 +227,9 @@
   background: rgba(8, 11, 28, 0.72);
   border: 1px solid rgba(242, 244, 247, 0.12);
   padding: var(--space-4);
-  transition: transform var(--dur-ui) var(--ease-out), border-color var(--dur-ui) var(--ease-out);
+  transition: border-color var(--dur-ui) var(--ease-out);
 }
-.work:hover, .work:focus-within { transform: translateY(-4px); border-color: var(--sd-secondary); }
+.work:hover, .work:focus-within { border-color: var(--sd-secondary); }
 .work__thumb {
   position: relative; aspect-ratio: 16 / 10; margin-bottom: var(--space-4);
   background: var(--sd-surface); overflow: hidden;
@@ -309,18 +308,19 @@ html.is-loading { overflow: hidden; }
 /* ---------- Custom cursor ---------- */
 .cursor { position: fixed; inset: 0; z-index: 70; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
 .cursor.is-visible { opacity: 1; }
-.cursor__dot, .cursor__ring { position: absolute; top: 0; left: 0; border-radius: 50%; will-change: transform; }
-.cursor__dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--sd-primary); transition: transform 0.25s var(--ease-out), opacity 0.25s; }
-.cursor__ring { width: 36px; height: 36px; margin: -18px 0 0 -18px; border: 1px solid rgba(242, 244, 247, 0.45); }
-.cursor__ring::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid var(--sd-primary); opacity: 0; transform: scale(0.6); transition: transform 0.35s var(--ease-out), opacity 0.35s; }
+.cursor__dot, .cursor__ring { position: absolute; top: 0; left: 0; will-change: transform; }
+/* the ■ node from the wordmark, not a generic round cursor */
+.cursor__dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--sd-primary); }
+.cursor__ring { width: 30px; height: 30px; margin: -15px 0 0 -15px; border: 1px solid rgba(242, 244, 247, 0.4); }
+.cursor__ring::before { content: ""; position: absolute; inset: -1px; border: 1px solid var(--sd-primary); opacity: 0; transform: scale(0.6); transition: transform 0.35s var(--ease-out), opacity 0.35s; }
 .cursor.is-hover .cursor__ring::before { opacity: 1; transform: scale(1.6); }
 .cursor.is-hover .cursor__ring { border-color: transparent; }
-.cursor.is-hover .cursor__dot { transform: scale(0.5); }
+.cursor.is-hover .cursor__dot { opacity: 0.4; }
 .cursor.is-down .cursor__ring::before { transform: scale(1.3); }
 html.has-cursor, html.has-cursor a, html.has-cursor button { cursor: none; }
 
 /* ---------- Header progress ---------- */
-.header__progress { position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%; background: var(--sd-primary); transform-origin: left; transform: scaleX(0); opacity: 0.9; }
+.progress { position: fixed; top: 0; left: 0; z-index: 5; height: 2px; width: 100%; background: var(--sd-primary); transform-origin: left; transform: scaleX(0); opacity: 0.9; pointer-events: none; }
 
 /* ---------- Big section numerals ---------- */
 .section-num {

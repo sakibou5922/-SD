@@ -68,7 +68,10 @@ export function runPreloader(reduced: boolean): Promise<void> {
     new Promise<void>((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', () => r(), { once: true }))),
   ]);
 
-  if (reduced) {
+  let seen = false;
+  try { seen = sessionStorage.getItem('sd-loaded') === '1'; sessionStorage.setItem('sd-loaded', '1'); } catch { /* private mode */ }
+
+  if (reduced || seen) {
     return ready.then(() => {
       el.style.transition = 'opacity 0.3s';
       el.style.opacity = '0';
@@ -77,9 +80,9 @@ export function runPreloader(reduced: boolean): Promise<void> {
   }
 
   const state = { p: 0 };
-  const minTime = new Promise<void>((r) => window.setTimeout(r, 1100));
+  const minTime = new Promise<void>((r) => window.setTimeout(r, 650));
   const counter = gsap.to(state, {
-    p: 92, duration: 1.4, ease: 'power2.out',
+    p: 92, duration: 0.9, ease: 'power2.out',
     onUpdate: () => { count.textContent = String(Math.round(state.p)).padStart(3, '0'); fill.style.transform = `scaleX(${state.p / 100})`; },
   });
 
@@ -87,11 +90,11 @@ export function runPreloader(reduced: boolean): Promise<void> {
     counter.kill();
     const tl = gsap.timeline();
     tl.to(state, {
-      p: 100, duration: 0.35, ease: 'power2.inOut',
+      p: 100, duration: 0.2, ease: 'power2.inOut',
       onUpdate: () => { count.textContent = String(Math.round(state.p)).padStart(3, '0'); fill.style.transform = `scaleX(${state.p / 100})`; },
     });
-    tl.to(el.querySelector('.preloader__inner'), { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, '+=0.1');
-    tl.to(el, { yPercent: -100, duration: 0.9, ease: 'power4.inOut', onStart: () => { document.documentElement.classList.remove('is-loading'); resolve(); } }, '-=0.05');
+    tl.to(el.querySelector('.preloader__inner'), { opacity: 0, y: -12, duration: 0.25, ease: 'power2.in' }, '+=0.05');
+    tl.to(el, { yPercent: -100, duration: 0.7, ease: 'power4.inOut', onStart: () => { document.documentElement.classList.remove('is-loading'); resolve(); } }, '-=0.1');
     tl.call(() => el.remove());
   }));
 }

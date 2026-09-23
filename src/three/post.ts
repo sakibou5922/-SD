@@ -9,8 +9,8 @@ const GradeShader = {
   uniforms: {
     tDiffuse: { value: null },
     uTime: { value: 0 },
-    uGrain: { value: 0.04 },
-    uVignette: { value: 0.26 },
+    uGrain: { value: 0.03 },
+    uVignette: { value: 0.14 },
     uCA: { value: 0.0009 },
   },
   vertexShader: /* glsl */ `

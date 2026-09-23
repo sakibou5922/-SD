@@ -75,7 +75,7 @@ export function setupSections(o: SectionsOptions): () => void {
   {
     const tl = sectionTimeline('hero');
     // mobile: lift the (large) galaxy above the headline, settle to 0 before About
-    const heroY = o.shift ? 0 : 1.2;
+    const heroY = o.shift ? 0 : 1.7;
     S.groupY = heroY;
     seg(tl, 0, 1, { camX: 0, camY: 4.2, camZ: 8.0, pointSize: 2.6, groupY: heroY }, { camX: 0.4, camY: 2.6, camZ: 7.4, pointSize: 2.0, groupY: 0 });
     seg(tl, 0.75, 1, { w0: 1, w1: 0 }, { w0: 0.6, w1: 0.4 });
@@ -186,15 +186,18 @@ export function setupSections(o: SectionsOptions): () => void {
     // starts while the section is still entering (Company only animates in its first 40%)
     const tl = sectionTimeline('contact', { start: 'top 45%', end: 'max' });
     const morphEnd = o.shift ? 0.5 : 0.3;
-    const groupY = o.shift ? -0.3 : 0.9; // mobile: the ring floats above the centred heading
+    // desktop: the ring is pushed outside the text block (closer camera, lower); mobile: nearly edge-on above the heading
+    const groupY = o.shift ? -0.5 : 1.9;
+    const ringRotX = o.shift ? 0.12 : 0.75;
+    const contactZ = o.shift ? 6.2 : 7.5;
     seg(tl, 0, morphEnd * 0.5, { slabOpacity: 0.8 }, { slabOpacity: 0 });
     seg(tl, 0, morphEnd, { w5: 1, w6: 0, pointSize: 1.6, noise: 0.02, breath: 0.012, accentMix: 0.15, idleSpeed: 0.01, colorMix: 0.3 },
       { w5: 0, w6: 1, pointSize: 2.0, noise: 0.05, breath: 0.02, accentMix: 0.4, idleSpeed: 0.04, colorMix: 1 });
-    seg(tl, 0, morphEnd, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, groupY: 0 }, { camX: 0, camY: 0.4, camZ: 7.5, tX: X_CONTACT, tY: 0, groupY });
+    seg(tl, 0, morphEnd, { camX: -1.6, camY: -0.8, camZ: 7.0, tX: X_COMPANY, tY: 0.6, groupY: 0, rotX: 0 }, { camX: 0, camY: 0.4, camZ: contactZ, tX: X_CONTACT, tY: 0, groupY, rotX: ringRotX });
     bg(tl, 0, morphEnd, { '--bg-x': '35%', '--bg-y': '55%' }, { '--bg-x': '50%', '--bg-y': '50%' });
     seg(tl, morphEnd * 0.6, morphEnd, { orbitOpacity: 0 }, { orbitOpacity: 1 });
     // footer tail
-    seg(tl, 0.7, 1, { opacity: 1, camZ: 7.5 }, { opacity: 0.35, camZ: 8.5 });
+    seg(tl, 0.7, 1, { opacity: 1, camZ: contactZ }, { opacity: 0.35, camZ: contactZ + 1 });
     bg(tl, 0.7, 1, { '--bg-y': '50%' }, { '--bg-y': '100%' });
     tls.push(tl);
   }

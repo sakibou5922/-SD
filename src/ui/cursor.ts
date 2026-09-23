@@ -28,7 +28,6 @@ export function setupCursor(): void {
   document.addEventListener('pointerover', (e) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>(HOVER);
     root.classList.toggle('is-hover', !!t);
-    root.classList.toggle('is-text', !!t && t.dataset.cursor === 'text');
   });
   document.addEventListener('pointerdown', () => root.classList.add('is-down'));
   document.addEventListener('pointerup', () => root.classList.remove('is-down'));

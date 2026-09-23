@@ -245,8 +245,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     planetMesh.rotation.y = time * 0.05;
     // orbiting light: ring param → tilt 18° about X (matches the T6 target)
     orbitMesh.visible = S.orbitOpacity > 0.002;
-    orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 1 : 0.8);
-    orbitGlowMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.35 : 0.12);
+    orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.5 : 0.8);
+    orbitGlowMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.10 : 0.12);
     {
       const a = time * 0.45, R = 2.6, tilt = (18 * Math.PI) / 180;
       const x = R * Math.cos(a), z = R * Math.sin(a);
@@ -311,6 +311,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       const avg = acc / frames;
       acc = 0; frames = 0;
       if (avg > 22 && dpr > 1) { setDpr(Math.max(1, dpr - 0.25)); goodStreak = 0; }
+      else if (avg > 22 && post) { post.dispose(); post = null; goodStreak = 0; } // still slow at DPR 1: drop post-processing
       else if (avg < 18) { goodStreak += 60; if (goodStreak >= 180 && dpr < maxDpr) { setDpr(Math.min(maxDpr, dpr + 0.25)); goodStreak = 0; } }
       else goodStreak = 0;
     }
