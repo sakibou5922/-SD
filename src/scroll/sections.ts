@@ -66,7 +66,10 @@ export function setupSections(o: SectionsOptions): () => void {
   /* ---------- 1. Hero — 点 ---------- */
   {
     const tl = sectionTimeline('hero');
-    seg(tl, 0, 1, { camZ: 9, pointSize: 2.2 }, { camZ: 7.6, pointSize: 2.0 });
+    // mobile: lift the (large) galaxy above the headline, settle to 0 before About
+    const heroY = o.shift ? 0 : 1.2;
+    S.groupY = heroY;
+    seg(tl, 0, 1, { camX: 0, camY: 4.2, camZ: 8.0, pointSize: 2.6, groupY: heroY }, { camX: 0.4, camY: 2.6, camZ: 7.4, pointSize: 2.0, groupY: 0 });
     seg(tl, 0.75, 1, { w0: 1, w1: 0 }, { w0: 0.6, w1: 0.4 });
     tl.fromTo('#hero-inner', { y: 0, opacity: 1 }, { y: -80, opacity: 0, duration: 0.6, immediateRender: false }, EPS);
     tls.push(tl);
@@ -75,8 +78,8 @@ export function setupSections(o: SectionsOptions): () => void {
   /* ---------- 2. About — 核 ---------- */
   {
     const tl = sectionTimeline('about');
-    seg(tl, 0, 0.35, { w0: 0.6, w1: 0.4, noise: 0.35, accentMix: 0.1 }, { w0: 0, w1: 1, noise: 0.08, accentMix: 0.25 });
-    seg(tl, 0, 0.4, { camX: 0, camY: 0.2, camZ: 7.6, tX: 0 }, { camX: 1.2, camY: 0.6, camZ: 6.5, tX: X_ABOUT });
+    seg(tl, 0, 0.35, { w0: 0.6, w1: 0.4, noise: 0.12, accentMix: 0.1 }, { w0: 0, w1: 1, noise: 0.08, accentMix: 0.25 });
+    seg(tl, 0, 0.4, { camX: 0.4, camY: 2.6, camZ: 7.4, tX: 0 }, { camX: 1.2, camY: 0.6, camZ: 6.5, tX: X_ABOUT });
     seg(tl, 0, 1, { rotY: 0 }, { rotY: 0.4 });
     bg(tl, 0, 0.4, { '--bg-x': '50%', '--bg-y': '60%' }, { '--bg-x': '62%', '--bg-y': '45%' });
     seg(tl, 0.8, 1, { w1: 1, w2: 0 }, { w1: 0.5, w2: 0.5 });

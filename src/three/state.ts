@@ -5,8 +5,8 @@
 export const sceneState = {
   // morph weights: cloud, sphere, lattice, grid, knot, slab, ring
   w0: 1, w1: 0, w2: 0, w3: 0, w4: 0, w5: 0, w6: 0,
-  noise: 0.35,
-  pointSize: 2.2,
+  noise: 0.12,
+  pointSize: 2.6,
   opacity: 1,
   lineOpacity: 0,
   lineDraw: 1,
@@ -21,7 +21,7 @@ export const sceneState = {
   idleSpeed: 0.04,
   knotOpacity: 0,
   slabOpacity: 0,
-  camX: 0, camY: 0.2, camZ: 9,
+  camX: 0, camY: 4.2, camZ: 8.0,
   tX: 0, tY: 0, tZ: 0,
   fov: 42,
 };

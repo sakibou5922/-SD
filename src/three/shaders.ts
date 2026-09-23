@@ -56,6 +56,7 @@ attribute vec3 aSlab;
 attribute vec3 aRing;
 attribute float aSeed;
 attribute float aCluster;
+attribute float aGal;
 
 uniform float uW[7];
 uniform float uTime;
@@ -69,6 +70,9 @@ uniform float uAccentMix;
 uniform float uFog;
 uniform vec3 uColorA;
 uniform vec3 uColorB;
+uniform vec3 uGalCore;
+uniform vec3 uGalArm;
+uniform vec3 uGalRim;
 uniform float uClusterLit[4];
 
 varying vec3 vColor;
@@ -98,6 +102,11 @@ void main() {
   vec3 col = mix(uColorA, uColorB, accent);
   col = mix(col, uColorB, lit * 0.85);
   col *= 1.0 + 0.2 * step(0.7, aSeed);
+  // galaxy ramp (only while the T0 target dominates): warm core → cyan arms → violet rim
+  vec3 gcol = mix(uGalCore, uGalArm, smoothstep(0.0, 0.45, aGal));
+  gcol = mix(gcol, uGalRim, smoothstep(0.6, 1.0, aGal));
+  gcol *= 1.0 + 0.7 * (1.0 - smoothstep(0.0, 0.3, aGal));
+  col = mix(col, gcol, uW[0]);
   vColor = col;
 
   float d = -mv.z;
@@ -107,7 +116,8 @@ void main() {
   #ifdef LINE
     vAlpha *= 0.9;
   #else
-    gl_PointSize = uPointSize * uSizeMul * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (6.0 / d);
+    float core = uW[0] * (1.0 - smoothstep(0.0, 0.25, aGal));
+    gl_PointSize = uPointSize * uSizeMul * uDpr * (0.7 + 0.7 * aSeed) * (1.0 + 0.35 * lit) * (1.0 + 0.7 * core) * (6.0 / d);
   #endif
   gl_Position = projectionMatrix * mv;
 }

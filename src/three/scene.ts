@@ -68,6 +68,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   geo.setAttribute('aRing', attr(targets.ring, 3));
   geo.setAttribute('aSeed', attr(targets.seed, 1));
   geo.setAttribute('aCluster', attr(targets.cluster, 1));
+  geo.setAttribute('aGal', attr(targets.gal, 1));
   // generous bounding sphere: never frustum-cull the cloud
   geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 12);
 
@@ -92,6 +93,9 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     uFog: { value: 0.055 },
     uColorA: { value: COLORS.base.clone() },
     uColorB: { value: COLORS.primary.clone() },
+    uGalCore: { value: new THREE.Color('#ffe9c4') },
+    uGalArm: { value: new THREE.Color('#8ad8ff') },
+    uGalRim: { value: new THREE.Color('#a98bff') },
     uClusterLit: { value: new Float32Array(4) },
     uGlow: { value: 1 },
     uSizeMul: { value: 1 },
@@ -110,7 +114,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       premultipliedAlpha: true,
     });
   const pointsMat = mkMaterial({}, 1);
-  const glowMat = mkMaterial({}, 0.08, 3); // halo pass: 3x size, 8% alpha
+  const glowMat = mkMaterial({}, 0.12, 3); // halo pass: 3x size, 12% alpha
   const lineMat = mkMaterial({ LINE: '' }, 1);
 
   const points = new THREE.Points(geo, pointsMat);
@@ -197,7 +201,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     mouse.y += (mouse.ty - mouse.y) * 0.05;
     idleY += S.idleSpeed * dt + (parallaxEnabled ? mouse.x * 0.06 * dt : 0);
     group.rotation.set(S.rotX, idleY + S.rotY, 0);
-    group.position.y = S.groupY + (opts.isMobile ? 0.6 : 0);
+    group.position.y = S.groupY + (opts.isMobile ? 0.8 : 0); // mobile: object sits above the text
     const breathe = 1 + 0.015 * Math.sin(time * 0.8);
     group.scale.setScalar(BASE_SCALE * breathe);
 

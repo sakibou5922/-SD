@@ -58,6 +58,16 @@ hr { border: 0; }
   content: ""; position: absolute; inset: 0;
   background: radial-gradient(90% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.42) 100%);
 }
+.bg-stars {
+  position: absolute; inset: 0; opacity: 0.16;
+  background-image:
+    radial-gradient(circle at 20% 30%, #f2f4f7 0.6px, transparent 1.2px),
+    radial-gradient(circle at 70% 60%, #8ad8ff 0.6px, transparent 1.2px),
+    radial-gradient(circle at 45% 80%, #f2f4f7 0.5px, transparent 1px),
+    radial-gradient(circle at 85% 15%, #f0c674 0.5px, transparent 1px),
+    radial-gradient(circle at 10% 65%, #f2f4f7 0.4px, transparent 0.9px);
+  background-size: 170px 170px, 260px 260px, 110px 110px, 340px 340px, 90px 90px;
+}
 .bg-fallback {
   position: absolute; inset: 0; display: none; opacity: 0.18;
   background-image:

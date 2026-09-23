@@ -15,6 +15,8 @@ export type TargetSet = {
   ring: Float32Array;
   seed: Float32Array;
   cluster: Float32Array;
+  /** 0 at the galaxy core, 1 at the rim (colour ramp for the T0 target) */
+  gal: Float32Array;
   idxLattice: Uint32Array;
   idxKnot: Uint32Array;
 };
@@ -43,28 +45,6 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-/* ---- small CPU value noise (for clumping the cloud) ---- */
-function hash3(x: number, y: number, z: number): number {
-  let h = (x * 374761393 + y * 668265263 + z * 2147483647) | 0;
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-const smooth = (t: number) => t * t * (3 - 2 * t);
-function vnoise(x: number, y: number, z: number): number {
-  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
-  const xf = smooth(x - xi), yf = smooth(y - yi), zf = smooth(z - zi);
-  const l = (a: number, b: number, t: number) => a + (b - a) * t;
-  const c000 = hash3(xi, yi, zi), c100 = hash3(xi + 1, yi, zi);
-  const c010 = hash3(xi, yi + 1, zi), c110 = hash3(xi + 1, yi + 1, zi);
-  const c001 = hash3(xi, yi, zi + 1), c101 = hash3(xi + 1, yi, zi + 1);
-  const c011 = hash3(xi, yi + 1, zi + 1), c111 = hash3(xi + 1, yi + 1, zi + 1);
-  return l(
-    l(l(c000, c100, xf), l(c010, c110, xf), yf),
-    l(l(c001, c101, xf), l(c011, c111, xf), yf),
-    zf,
-  ) * 2 - 1;
-}
-
 export function buildTargets(opts: TargetOptions): TargetSet {
   const S = opts.side;
   const n = S * S * S;
@@ -73,28 +53,38 @@ export function buildTargets(opts: TargetOptions): TargetSet {
   const cluster = new Float32Array(n);
   for (let i = 0; i < n; i++) seed[i] = rand();
 
-  /* T0 cloud */
+  /* T0 galaxy — spiral disc (2 arms) + core bulge + halo stars */
   const cloud = new Float32Array(n * 3);
+  const gal = new Float32Array(n);
   {
-    const R = 5.5;
+    const R = 6.0, ARMS = 2, TWIST = 1.1;
+    const gauss = () => {
+      const u1 = Math.max(rand(), 1e-6), u2 = rand();
+      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    };
     for (let i = 0; i < n; i++) {
-      const u = rand();
-      const r = R * Math.cbrt(u);
-      const z = rand() * 2 - 1;
-      const a = rand() * Math.PI * 2;
-      const s = Math.sqrt(1 - z * z);
-      const dx = s * Math.cos(a), dy = s * Math.sin(a), dz = z;
-      let px = dx * r, py = dy * r, pz = dz * r;
-      // clump into nebula-like knots
-      const k = 0.35;
-      px += vnoise(px * k + 11.3, py * k, pz * k) * 1.8;
-      py += vnoise(px * k, py * k + 7.1, pz * k) * 1.8;
-      pz += vnoise(px * k, py * k, pz * k + 3.7) * 1.8;
+      let px: number, py: number, pz: number;
       if (i % 7 === 0) {
-        const hr = 6 + rand() * 3;
-        px = dx * hr; py = dy * hr; pz = dz * hr;
+        // halo: sparse stars around and above the disc
+        const z = rand() * 2 - 1, a = rand() * Math.PI * 2, sx = Math.sqrt(1 - z * z);
+        const r = 4 + rand() * 5;
+        px = sx * Math.cos(a) * r; py = z * r * 0.6; pz = sx * Math.sin(a) * r;
+      } else if (i % 5 === 0) {
+        // core bulge
+        px = gauss() * 0.7; py = gauss() * 0.4; pz = gauss() * 0.7;
+      } else {
+        // spiral arms: denser towards the centre, angular scatter grows inward
+        const r = R * Math.pow(rand(), 0.55);
+        const arm = i % ARMS;
+        const t = 1 - r / R;
+        const angle = arm * ((2 * Math.PI) / ARMS) + r * TWIST + gauss() * (0.12 + 0.22 * t);
+        const rs = gauss() * 0.18;
+        px = (r + rs) * Math.cos(angle);
+        pz = (r + rs) * Math.sin(angle);
+        py = gauss() * (0.05 + 0.3 * t);
       }
       cloud[i * 3] = px; cloud[i * 3 + 1] = py; cloud[i * 3 + 2] = pz;
+      gal[i] = Math.min(1, Math.hypot(px, pz) / R);
     }
   }
 
@@ -247,7 +237,7 @@ export function buildTargets(opts: TargetOptions): TargetSet {
   }
 
   return {
-    n, cloud, sphere, lattice, grid, knot, slab, ring, seed, cluster,
+    n, cloud, sphere, lattice, grid, knot, slab, ring, seed, cluster, gal,
     idxLattice: new Uint32Array(lat),
     idxKnot: new Uint32Array(kn),
   };
