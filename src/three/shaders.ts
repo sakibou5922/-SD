@@ -59,6 +59,7 @@ attribute float aCluster;
 attribute float aGal;
 
 uniform float uW[7];
+uniform mat3 uSaturnRot;   // tilt · spin for the T0 ring (stored untilted)
 uniform float uTime;
 uniform float uNoiseAmp;
 uniform float uPointSize;
@@ -81,7 +82,8 @@ varying float vAlpha;
 ${SIMPLEX}
 
 void main() {
-  vec3 target = aCloud * uW[0] + aSphere * uW[1] + aLattice * uW[2] + aGrid * uW[3]
+  vec3 sat = uSaturnRot * aCloud;
+  vec3 target = sat * uW[0] + aSphere * uW[1] + aLattice * uW[2] + aGrid * uW[3]
               + aKnot * uW[4] + aSlab * uW[5] + aRing * uW[6];
   float mx = 1.0 - max(max(max(uW[0], uW[1]), max(uW[2], uW[3])), max(max(uW[4], uW[5]), uW[6]));
   // noise is sampled in target space (no per-point offset) so neighbours move together
@@ -112,6 +114,8 @@ void main() {
   float d = -mv.z;
   float fog = exp(-uFog * uFog * d * d);
   vAlpha = uOpacity * fog * (0.55 + 0.45 * aSeed);
+  // the atom's thin orbits need extra brightness on the lighter background
+  vAlpha *= 1.0 + 0.35 * uW[1];
 
   #ifdef LINE
     vAlpha *= 0.9;
@@ -164,6 +168,70 @@ void main() {
   float f = pow(1.0 - max(dot(normalize(vN), normalize(vV)), 0.0), uPower);
   vec3 c = mix(uBase, uRim, f);
   float a = (uBodyAlpha + (1.0 - uBodyAlpha) * f) * uOpacity;
+  gl_FragColor = vec4(c * a, a);
+}
+`;
+
+export const PLANET_VERT = /* glsl */ `
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vP;
+void main() {
+  vN = normalize(normalMatrix * normal);
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vV = normalize(-mv.xyz);
+  vP = position;
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+/** Hero planet: dark navy body with faint bands, cyan limb toward the light, violet limb on the far side. */
+export const PLANET_FRAG = /* glsl */ `
+precision highp float;
+uniform vec3 uBase;
+uniform vec3 uBand;
+uniform vec3 uRimLit;
+uniform vec3 uRimDark;
+uniform vec3 uLightDir;   // view-space
+uniform float uOpacity;
+uniform float uTime;
+varying vec3 vN;
+varying vec3 vV;
+varying vec3 vP;
+float hash(float n) { return fract(sin(n) * 43758.5453); }
+float noise1(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(hash(i), hash(i + 1.0), f); }
+void main() {
+  vec3 n = normalize(vN);
+  vec3 v = normalize(vV);
+  float ndl = dot(n, normalize(uLightDir));
+  float lit = smoothstep(-0.35, 0.6, ndl);
+  // latitude bands drifting slowly
+  float lat = vP.y / length(vP);
+  float bands = noise1(lat * 9.0 + uTime * 0.02) * 0.6 + noise1(lat * 23.0 - uTime * 0.015) * 0.4;
+  vec3 body = mix(uBase, uBand, bands * 0.5) * (0.35 + 0.75 * lit);
+  float f = pow(1.0 - max(dot(n, v), 0.0), 2.4);
+  vec3 rim = mix(uRimDark, uRimLit, smoothstep(-0.2, 0.7, ndl));
+  vec3 c = body + rim * f * 1.6;
+  gl_FragColor = vec4(c * uOpacity, uOpacity);
+}
+`;
+
+/** Atmosphere halo: back-face shell, additive, strongest at the limb. */
+export const HALO_FRAG = /* glsl */ `
+precision highp float;
+uniform vec3 uColorLit;
+uniform vec3 uColorDark;
+uniform vec3 uLightDir;
+uniform float uOpacity;
+varying vec3 vN;
+varying vec3 vV;
+void main() {
+  vec3 n = normalize(vN);
+  // rendered with side: BackSide, so the visible faces' normals point away from the camera
+  float f = pow(clamp(-dot(n, normalize(vV)) * 2.4, 0.0, 1.0), 1.5);
+  float ndl = dot(n, normalize(uLightDir));
+  vec3 c = mix(uColorDark, uColorLit, smoothstep(-0.3, 0.6, ndl));
+  float a = f * uOpacity;
   gl_FragColor = vec4(c * a, a);
 }
 `;

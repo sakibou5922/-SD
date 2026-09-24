@@ -24,6 +24,10 @@ uniform vec3 uBgC;
 uniform vec3 uNebA;
 uniform vec3 uNebB;
 uniform float uStars;
+uniform sampler2D uPhoto;
+uniform float uPhotoMix;     // 0 = procedural only, 1 = photo base
+uniform float uPhotoDim;     // darkening applied to the photo (keeps text readable)
+uniform vec2 uPhotoOffset;   // slow drift / parallax in uv units
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
 float noise(vec2 p) {
@@ -44,6 +48,16 @@ void main() {
   vec2 p = uv * vec2(aspect, 1.0);
 
   vec3 col = uBg;
+  // photographic starfield base (cover-fit, slow drift)
+  {
+    float imgAspect = 1672.0 / 941.0;
+    vec2 st = uv;
+    if (aspect > imgAspect) { st.y = (st.y - 0.5) * (imgAspect / aspect) + 0.5; }
+    else { st.x = (st.x - 0.5) * (aspect / imgAspect) + 0.5; }
+    st = (st - 0.5) * 0.92 + 0.5 + uPhotoOffset;
+    vec3 photo = texture2D(uPhoto, st).rgb;
+    col = mix(col, photo * uPhotoDim, uPhotoMix);
+  }
   // moving centre glow (driven by the scroll timelines)
   vec2 d = (uv - uBgPos) * vec2(aspect, 1.0);
   float g = 1.0 - smoothstep(0.0, 0.8, length(d));
@@ -54,7 +68,7 @@ void main() {
   float n2 = fbm(p * 2.2 + vec2(-uTime * 0.007, uTime * 0.011) + 7.3);
   float mA = smoothstep(0.42, 0.82, n1) * (1.0 - smoothstep(0.0, 1.0, distance(p, vec2(0.85 * aspect, 0.85)) * 1.1));
   float mB = smoothstep(0.48, 0.86, n2) * (1.0 - smoothstep(0.0, 1.0, distance(p, vec2(0.12 * aspect, 0.12)) * 1.1));
-  col += uNebA * mA * 0.42 + uNebB * mB * 0.34;
+  col += (uNebA * mA * 0.42 + uNebB * mB * 0.34) * (1.0 - 0.6 * uPhotoMix);
 
   // distant stars (cell hashed), gentle twinkle
   vec2 q = p * (uRes.y / 42.0);
@@ -82,15 +96,28 @@ export function createBackground(): { mesh: THREE.Mesh; uniforms: Record<string,
     uRes: { value: new THREE.Vector2(1, 1) },
     uTime: { value: 0 },
     uBgPos: { value: new THREE.Vector2(0.5, 0.6) },
-    uBg: { value: new THREE.Color('#080b1c') },
-    uBgC: { value: new THREE.Color('#141b3a') },
-    uNebA: { value: new THREE.Color('#5a3fb0') },
-    uNebB: { value: new THREE.Color('#2350b8') },
+    uBg: { value: new THREE.Color('#102149') },
+    uBgC: { value: new THREE.Color('#1a3466') },
+    uNebA: { value: new THREE.Color('#6a4fc4') },
+    uNebB: { value: new THREE.Color('#2f66d0') },
     uStars: { value: 1 },
+    uPhoto: { value: null },
+    uPhotoMix: { value: 0 },
+    uPhotoDim: { value: 0.78 },
+    uPhotoOffset: { value: new THREE.Vector2(0, 0) },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms, depthWrite: false, depthTest: false });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
   mesh.frustumCulled = false;
   mesh.renderOrder = -100;
+  // photographic base layer (client-supplied starfield); fades in once loaded
+  new THREE.TextureLoader().load('./images/starfield.webp', (tex) => {
+    tex.colorSpace = THREE.NoColorSpace;
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    uniforms.uPhoto.value = tex;
+    uniforms.uPhotoMix.value = 1;
+  });
   return { mesh, uniforms };
 }

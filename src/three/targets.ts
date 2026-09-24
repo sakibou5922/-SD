@@ -53,68 +53,60 @@ export function buildTargets(opts: TargetOptions): TargetSet {
   const cluster = new Float32Array(n);
   for (let i = 0; i < n; i++) seed[i] = rand();
 
-  /* T0 galaxy — spiral disc (2 arms) + core bulge + halo stars */
+  /* T0 saturn — ring system around the hero planet (planet radius R_P = 1, scaled in the scene) */
   const cloud = new Float32Array(n * 3);
   const gal = new Float32Array(n);
   {
-    const R = 6.0, ARMS = 2, TWIST = 1.1;
-    const gauss = () => {
-      const u1 = Math.max(rand(), 1e-6), u2 = rand();
-      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    };
+    // bands: [inner, outer, weight]
+    const bands: [number, number, number][] = [[1.32, 1.68, 0.34], [1.74, 2.10, 0.30], [2.16, 2.36, 0.14], [2.42, 2.70, 0.14]];
+    const wsum = bands.reduce((t, b) => t + b[2], 0);
+    const gauss = () => { const u1 = Math.max(rand(), 1e-6), u2 = rand(); return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); };
     for (let i = 0; i < n; i++) {
-      let px: number, py: number, pz: number;
-      if (i % 7 === 0) {
-        // halo: sparse stars around and above the disc
-        const z = rand() * 2 - 1, a = rand() * Math.PI * 2, sx = Math.sqrt(1 - z * z);
-        const r = 4 + rand() * 5;
-        px = sx * Math.cos(a) * r; py = z * r * 0.6; pz = sx * Math.sin(a) * r;
-      } else if (i % 5 === 0) {
-        // core bulge
-        px = gauss() * 0.7; py = gauss() * 0.4; pz = gauss() * 0.7;
+      let x: number, y: number, z: number;
+      if (i % 12 === 0) {
+        // 8%: halo stars far from the planet
+        const zz = rand() * 2 - 1, a2 = rand() * Math.PI * 2, sxy = Math.sqrt(1 - zz * zz);
+        const r = 3.2 + rand() * 4.5;
+        x = sxy * Math.cos(a2) * r; y = zz * r * 0.7; z = sxy * Math.sin(a2) * r;
       } else {
-        // spiral arms: denser towards the centre, angular scatter grows inward
-        const r = R * Math.pow(rand(), 0.55);
-        const arm = i % ARMS;
-        const t = 1 - r / R;
-        const angle = arm * ((2 * Math.PI) / ARMS) + r * TWIST + gauss() * (0.12 + 0.22 * t);
-        const rs = gauss() * 0.18;
-        px = (r + rs) * Math.cos(angle);
-        pz = (r + rs) * Math.sin(angle);
-        py = gauss() * (0.05 + 0.3 * t);
+        let u = rand() * wsum, band = bands[0];
+        for (const bnd of bands) { if (u < bnd[2]) { band = bnd; break; } u -= bnd[2]; }
+        // density falls off towards the outer edge of each band
+        const t = Math.pow(rand(), 0.8);
+        const r = band[0] + (band[1] - band[0]) * t;
+        const a2 = rand() * Math.PI * 2;
+        x = r * Math.cos(a2); z = r * Math.sin(a2);
+        y = gauss() * 0.012;
       }
-      cloud[i * 3] = px; cloud[i * 3 + 1] = py; cloud[i * 3 + 2] = pz;
-      gal[i] = Math.min(1, Math.hypot(px, pz) / R);
+      // stored untilted: the tilt (X 22°, Z -12°) and the ring's own spin are applied in the vertex shader
+      cloud[i * 3] = x; cloud[i * 3 + 1] = y; cloud[i * 3 + 2] = z;
+      gal[i] = Math.min(1, Math.max(0, (Math.hypot(x, z) - 1.3) / 1.4));
     }
   }
 
-  /* T1 planet — thin ring of points around the planet mesh + a sparse atmosphere shell */
+  /* T1 atom — three ellipses in the screen plane (a 2.0 / b 0.76) rotated -28°, 32°, 92°, a small nucleus and a faint cloud */
   const sphere = new Float32Array(n * 3);
   {
-    const SHELL = 2.05, R_IN = 2.7, R_OUT = 3.8;
-    const golden = Math.PI * (1 + Math.sqrt(5));
-    const tiltX = (22 * Math.PI) / 180, tiltZ = (10 * Math.PI) / 180;
-    const cx = Math.cos(tiltX), sx = Math.sin(tiltX), cz = Math.cos(tiltZ), sz = Math.sin(tiltZ);
+    const A = 2.0, B = 0.76, tube = 0.028;
+    const angles = [-28, 32, 92].map((d) => (d * Math.PI) / 180);
+    const gauss = () => { const u1 = Math.max(rand(), 1e-6), u2 = rand(); return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); };
     for (let i = 0; i < n; i++) {
       let x: number, y: number, z: number;
-      if (i % 3 === 0) {
-        // atmosphere shell (Fibonacci sphere just outside the mesh)
-        const phi = Math.acos(1 - (2 * (i + 0.5)) / n);
-        const theta = golden * i;
-        const j = SHELL * (1 + 0.04 * (rand() - 0.5));
-        x = j * Math.sin(phi) * Math.cos(theta); y = j * Math.sin(phi) * Math.sin(theta); z = j * Math.cos(phi);
+      const m = i % 20;
+      if (m === 0) {
+        x = gauss() * 0.15; y = gauss() * 0.15; z = gauss() * 0.15;                       // nucleus 5%
+      } else if (m === 1) {
+        const r = 0.5 + Math.abs(gauss()) * 1.2;                                            // cloud 5%
+        const zz = rand() * 2 - 1, a2 = rand() * Math.PI * 2, sxy = Math.sqrt(1 - zz * zz);
+        x = sxy * Math.cos(a2) * r; y = zz * r * 0.7; z = sxy * Math.sin(a2) * r * 0.5;
       } else {
-        // ring: denser inner band, a faint gap, then the outer band
-        const u = rand();
-        const band = u < 0.62 ? R_IN + (R_OUT - R_IN) * 0.45 * (u / 0.62) : R_IN + (R_OUT - R_IN) * (0.55 + 0.45 * ((u - 0.62) / 0.38));
-        const a2 = rand() * Math.PI * 2;
-        x = band * Math.cos(a2); z = band * Math.sin(a2);
-        y = (rand() + rand() + rand() - 1.5) * 0.04;
+        const k = i % 3;
+        const t = 2 * Math.PI * ((i * 0.618034) % 1);
+        const px = A * Math.cos(t) + gauss() * tube, py = B * Math.sin(t) + gauss() * tube;
+        const ca = Math.cos(angles[k]), sa = Math.sin(angles[k]);
+        x = px * ca - py * sa; y = px * sa + py * ca; z = gauss() * tube + (k - 1) * 0.06;
       }
-      // tilt the whole target so the ring reads as a plane seen at an angle
-      const y1 = y * cx - z * sx, z1 = y * sx + z * cx;
-      const x2 = x * cz - y1 * sz, y2 = x * sz + y1 * cz;
-      sphere[i * 3] = x2; sphere[i * 3 + 1] = y2; sphere[i * 3 + 2] = z1;
+      sphere[i * 3] = x; sphere[i * 3 + 1] = y; sphere[i * 3 + 2] = z;
     }
   }
 

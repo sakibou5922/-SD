@@ -20,6 +20,19 @@ export function splitChars(el: HTMLElement): HTMLElement[] {
   return out;
 }
 
+/** The last headline line carries a text gradient; make it continuous across the split characters. */
+export function layoutTitleGradient(el: HTMLElement): void {
+  const line = el.querySelector<HTMLElement>('.line:last-child');
+  if (!line) return;
+  const chars = Array.from(line.querySelectorAll<HTMLElement>('.char > span'));
+  const w = line.getBoundingClientRect().width || 1;
+  for (const c of chars) {
+    const wrap = c.parentElement as HTMLElement;
+    c.style.setProperty('--gw', `${w}px`);
+    c.style.setProperty('--gx', `${-wrap.offsetLeft}px`);
+  }
+}
+
 /** Reading-progress bar in the header. */
 export function setupProgress(): void {
   const bar = document.getElementById('progress');

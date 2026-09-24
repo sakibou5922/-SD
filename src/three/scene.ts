@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { buildTargets, DESKTOP, MOBILE, type TargetSet } from './targets';
-import { POINTS_VERT, POINTS_FRAG, FRESNEL_VERT, FRESNEL_FRAG } from './shaders';
+import { POINTS_VERT, POINTS_FRAG, FRESNEL_VERT, FRESNEL_FRAG, PLANET_VERT, PLANET_FRAG, HALO_FRAG } from './shaders';
 import { sceneState as S } from './state';
 import { createBackground } from './background';
 import { createPost, type Post } from './post';
@@ -22,13 +22,13 @@ export type SceneController = {
 const BASE_SCALE = 0.75;
 
 const COLORS = {
-  base: new THREE.Color('#c7d6f0'),   // cool starlight white
-  primary: new THREE.Color('#8ad8ff'), // star cyan
-  secondary: new THREE.Color('#f0c674'), // star gold
-  knotBase: new THREE.Color('#1a1f3d'),
-  knotRim: new THREE.Color('#f0c674'),
-  slabBase: new THREE.Color('#2a3358'),
-  slabRim: new THREE.Color('#e6e9f5'),
+  base: new THREE.Color('#dce8ff'),     // starlight white
+  primary: new THREE.Color('#9adfff'),  // cyan (brief v1.3)
+  secondary: new THREE.Color('#ae9bff'), // violet (replaces brass)
+  knotBase: new THREE.Color('#1c2f66'),
+  knotRim: new THREE.Color('#ae9bff'),
+  slabBase: new THREE.Color('#25407a'),
+  slabRim: new THREE.Color('#e6f0ff'),
 };
 
 export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean; interactive: boolean }): SceneController | null {
@@ -47,7 +47,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   const maxDpr = opts.isMobile ? 1.5 : 2;
   let dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
   renderer.setPixelRatio(dpr);
-  renderer.setClearColor(0x080b1c, 1);
+  renderer.setClearColor(0x102149, 1);
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const scene = new THREE.Scene();
@@ -58,7 +58,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   /* background (gradient, nebulae, distant stars) drawn in-scene so post-processing covers it */
   const bgLayer = createBackground();
   scene.add(bgLayer.mesh);
-  const BG_INDIGO = new THREE.Color('#141b3a'), BG_AMBER = new THREE.Color('#2a1638');
+  const BG_INDIGO = new THREE.Color('#1a3466'), BG_AMBER = new THREE.Color('#3a2a6e');
   const bgTmp = new THREE.Color();
 
   /* post-processing: bloom + grade on desktop; direct render on mobile */
@@ -97,6 +97,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   /* ---------- materials ---------- */
   const uniforms = {
     uW: { value: new Float32Array([1, 0, 0, 0, 0, 0, 0]) },
+    uSaturnRot: { value: new THREE.Matrix3() },
     uTime: { value: 0 },
     uNoiseAmp: { value: S.noise },
     uPointSize: { value: S.pointSize },
@@ -107,9 +108,9 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     uFog: { value: 0.055 },
     uColorA: { value: COLORS.base.clone() },
     uColorB: { value: COLORS.primary.clone() },
-    uGalCore: { value: new THREE.Color('#ffe9c4') },
-    uGalArm: { value: new THREE.Color('#8ad8ff') },
-    uGalRim: { value: new THREE.Color('#a98bff') },
+    uGalCore: { value: new THREE.Color('#9adfff') },
+    uGalArm: { value: new THREE.Color('#f6fbff') },
+    uGalRim: { value: new THREE.Color('#ae9bff') },
     uClusterLit: { value: new Float32Array(4) },
     uGlow: { value: 1 },
     uSizeMul: { value: 1 },
@@ -162,13 +163,6 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   slabMesh.visible = false;
   group.add(knotMesh, slabMesh);
 
-  /* About: planet body. Writes depth and draws first so the ring of points passes behind it. */
-  const planetMat = fresnel(new THREE.Color('#152650'), new THREE.Color('#8ad8ff'), 2.2, 0.92, true);
-  const planetMesh = new THREE.Mesh(new THREE.SphereGeometry(1.9, opts.isMobile ? 32 : 56, opts.isMobile ? 20 : 36), planetMat);
-  planetMesh.renderOrder = -2;
-  planetMesh.visible = false;
-  group.add(planetMesh);
-
   /* Contact: a light travelling along the ring (T6 geometry: R 2.6, tilted 18°) */
   const orbitMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#e8f6ff'), transparent: true, opacity: 0, depthWrite: false });
   const orbitMesh = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), orbitMat);
@@ -178,19 +172,38 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   orbitMesh.visible = false;
   group.add(orbitMesh);
 
-  /* Hero: small ringed planet in the far background (world space, does not rotate with the group) */
-  const farGroup = new THREE.Group();
-  const farMat = fresnel(new THREE.Color('#1c2358'), new THREE.Color('#c9b8ff'), 2.4, 0.95, true);
-  const farPlanet = new THREE.Mesh(new THREE.SphereGeometry(opts.isMobile ? 0.28 : 0.4, 32, 20), farMat);
-  farPlanet.renderOrder = -2;
-  const farRingMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#a98bff'), transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
-  const farRing = new THREE.Mesh(new THREE.RingGeometry(opts.isMobile ? 0.38 : 0.55, opts.isMobile ? 0.55 : 0.8, 64), farRingMat);
-  farRing.rotation.x = Math.PI / 2 - 0.35;
-  farRing.rotation.z = 0.3;
-  farGroup.add(farPlanet, farRing);
-  // projected with the hero camera: desktop ≈ (1190px, 140px) of 1440×900, mobile ≈ (330px, 110px) of 390×844
-  farGroup.position.set(opts.isMobile ? 1.1 : 3.4, opts.isMobile ? 2.6 : 1.8, opts.isMobile ? -0.6 : -1.4);
-  scene.add(farGroup);
+  /* Hero: the ringed planet. Lives in the group at the origin; the T0 ring points orbit it. */
+  const PLANET_R = 1.0; // ring bands in targets.ts are expressed in planet radii; the group is scaled per layout
+  const lightDir = new THREE.Vector3(-0.6, 0.55, 0.7).normalize();
+  const planetMat = new THREE.ShaderMaterial({
+    vertexShader: PLANET_VERT, fragmentShader: PLANET_FRAG,
+    uniforms: {
+      uBase: { value: new THREE.Color('#0b1a45') }, uBand: { value: new THREE.Color('#2a4a9a') },
+      uRimLit: { value: new THREE.Color('#9adfff') }, uRimDark: { value: new THREE.Color('#ae9bff') },
+      uLightDir: { value: lightDir.clone() }, uOpacity: { value: 1 }, uTime: { value: 0 },
+    },
+    transparent: true, depthWrite: true, premultipliedAlpha: true,
+  });
+  const planetMesh = new THREE.Mesh(new THREE.SphereGeometry(PLANET_R, opts.isMobile ? 48 : 96, opts.isMobile ? 32 : 64), planetMat);
+  planetMesh.renderOrder = -2;
+  planetMesh.rotation.z = -0.2;
+  const haloMat = new THREE.ShaderMaterial({
+    vertexShader: PLANET_VERT, fragmentShader: HALO_FRAG,
+    uniforms: { uColorLit: { value: new THREE.Color('#9adfff') }, uColorDark: { value: new THREE.Color('#8f7cff') }, uLightDir: { value: lightDir.clone() }, uOpacity: { value: 0.55 } },
+    transparent: true, depthWrite: false, side: THREE.BackSide, blending: THREE.AdditiveBlending, premultipliedAlpha: true,
+  });
+  const haloMesh = new THREE.Mesh(new THREE.SphereGeometry(PLANET_R * 1.16, 48, 32), haloMat);
+  haloMesh.renderOrder = -3;
+  const planetGroup = new THREE.Group();
+  planetGroup.add(haloMesh, planetMesh);
+  group.add(planetGroup);
+  // one tilt for the ring (shader) and the planet's axis (mesh)
+  const SATURN_TILT = { x: (22 * Math.PI) / 180, z: (-12 * Math.PI) / 180 };
+  const tiltEuler = new THREE.Euler(SATURN_TILT.x, 0, SATURN_TILT.z, 'ZXY');
+  const tiltM4 = new THREE.Matrix4().makeRotationFromEuler(tiltEuler);
+  const spinM4 = new THREE.Matrix4();
+  const satM4 = new THREE.Matrix4();
+  planetGroup.rotation.copy(tiltEuler);
 
   /* ---------- interaction ---------- */
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -223,7 +236,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     uniforms.uNoiseAmp.value = S.noise;
     uniforms.uPointSize.value = S.pointSize;
     uniforms.uBreath.value = S.breath;
-    uniforms.uOpacity.value = S.opacity;
+    const mob = opts.isMobile ? 0.45 + 0.55 * Math.min(1, w[0] + w[6]) : 1;
+    uniforms.uOpacity.value = S.opacity * mob;
     uniforms.uAccentMix.value = S.accentMix;
     uniforms.uLineOpacity.value = S.lineOpacity;
     uniforms.uTime.value = time;
@@ -237,12 +251,18 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       lineGeo.setDrawRange(0, Math.max(0, Math.floor(count * S.lineDraw) & ~1));
     }
     knotMesh.visible = S.knotOpacity > 0.002;
-    knotMat.uniforms.uOpacity.value = S.knotOpacity;
+    knotMat.uniforms.uOpacity.value = S.knotOpacity * mob;
     slabMesh.visible = S.slabOpacity > 0.002;
-    slabMat.uniforms.uOpacity.value = S.slabOpacity;
-    planetMesh.visible = S.planetOpacity > 0.002;
-    planetMat.uniforms.uOpacity.value = S.planetOpacity;
-    planetMesh.rotation.y = time * 0.05;
+    slabMat.uniforms.uOpacity.value = S.slabOpacity * mob;
+    planetGroup.visible = S.heroPlanet > 0.002;
+    planetMat.uniforms.uOpacity.value = S.heroPlanet;
+    planetMat.uniforms.uTime.value = time;
+    haloMat.uniforms.uOpacity.value = 0.55 * S.heroPlanet;
+    planetMesh.rotation.y = time * 0.06;
+    // ring: spin about its own axis, then the shared tilt
+    spinM4.makeRotationY(time * 0.03);
+    satM4.multiplyMatrices(tiltM4, spinM4);
+    (uniforms.uSaturnRot.value as THREE.Matrix3).setFromMatrix4(satM4);
     // orbiting light: ring param → tilt 18° about X (matches the T6 target)
     orbitMesh.visible = S.orbitOpacity > 0.002;
     orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.5 : 0.8);
@@ -254,22 +274,21 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     }
     bgLayer.uniforms.uTime.value = time;
     bgLayer.uniforms.uBgPos.value.set(S.bgX, 1 - S.bgY);
+    bgLayer.uniforms.uPhotoOffset.value.set(0.012 * Math.sin(time * 0.05) + (parallaxEnabled ? -mouse.x * 0.01 : 0), 0.008 * Math.cos(time * 0.04) + (parallaxEnabled ? mouse.y * 0.008 : 0));
     bgTmp.lerpColors(BG_INDIGO, BG_AMBER, S.bgWarm);
     (bgLayer.uniforms.uBgC.value as THREE.Color).copy(bgTmp);
     if (post) post.grade.uniforms.uTime.value = time;
-    farGroup.visible = S.farOpacity > 0.002;
-    farMat.uniforms.uOpacity.value = S.farOpacity;
-    farRingMat.opacity = S.farOpacity * 0.45;
-    farGroup.rotation.y = time * 0.03;
+
 
     // idle + parallax
     mouse.x += (mouse.tx - mouse.x) * 0.05;
     mouse.y += (mouse.ty - mouse.y) * 0.05;
     idleY += S.idleSpeed * dt + (parallaxEnabled ? mouse.x * 0.06 * dt : 0);
     group.rotation.set(S.rotX, idleY + S.rotY, 0);
-    group.position.y = S.groupY + (opts.isMobile ? 0.8 : 0); // mobile: object sits above the text
+    group.position.set(S.groupX, S.groupY, 0);
     const breathe = 1 + 0.015 * Math.sin(time * 0.8);
-    group.scale.setScalar(BASE_SCALE * breathe);
+    group.scale.setScalar(BASE_SCALE * S.groupScale * breathe);
+
 
     camera.position.set(S.camX + (parallaxEnabled ? mouse.x * 0.5 : 0), S.camY - (parallaxEnabled ? mouse.y * 0.3 : 0), S.camZ);
     lookAt.set(S.tX, S.tY, S.tZ);
@@ -366,9 +385,9 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     document.removeEventListener('visibilitychange', onVisibility);
     geo.dispose(); lineGeo.dispose();
     pointsMat.dispose(); glowMat.dispose(); lineMat.dispose(); knotMat.dispose(); slabMat.dispose();
-    planetMat.dispose(); orbitMat.dispose(); orbitGlowMat.dispose(); farMat.dispose(); farRingMat.dispose();
-    knotMesh.geometry.dispose(); slabMesh.geometry.dispose(); planetMesh.geometry.dispose();
-    orbitMesh.geometry.dispose(); orbitGlow.geometry.dispose(); farPlanet.geometry.dispose(); farRing.geometry.dispose();
+    planetMat.dispose(); haloMat.dispose(); orbitMat.dispose(); orbitGlowMat.dispose();
+    knotMesh.geometry.dispose(); slabMesh.geometry.dispose(); planetMesh.geometry.dispose(); haloMesh.geometry.dispose();
+    orbitMesh.geometry.dispose(); orbitGlow.geometry.dispose();
     post?.dispose();
     (bgLayer.mesh.material as THREE.Material).dispose(); bgLayer.mesh.geometry.dispose();
     renderer.dispose();

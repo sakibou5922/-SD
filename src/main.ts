@@ -7,7 +7,7 @@ import { sceneState, REDUCED_STATE } from './three/state';
 import { setupHeader } from './ui/header';
 import { setupIndicator } from './ui/indicator';
 import { setupCursor } from './ui/cursor';
-import { splitChars, setupProgress, setupSectionNumerals, setupTilt, runPreloader } from './ui/effects';
+import { splitChars, layoutTitleGradient, setupProgress, setupSectionNumerals, setupTilt, runPreloader } from './ui/effects';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // point count / DPR are chosen once at load; scroll timelines are rebuilt per breakpoint below
@@ -72,6 +72,8 @@ window.addEventListener('scroll', () => {
 updateActive();
 
 const heroChars = splitChars(document.getElementById('hero-title')!);
+layoutTitleGradient(document.getElementById('hero-title')!);
+if (document.fonts?.ready) document.fonts.ready.then(() => layoutTitleGradient(document.getElementById('hero-title')!));
 setupProgress();
 setupSectionNumerals(reduced);
 setupTilt();
@@ -87,10 +89,10 @@ if (reduced) {
   // gsap.matchMedia reverts every tween / ScrollTrigger made inside when a breakpoint is crossed
   const mm = gsap.matchMedia();
   mm.add(
-    { desktop: '(min-width: 1024px)', tablet: '(min-width: 768px) and (max-width: 1023px)', mobile: '(max-width: 767px)' },
+    { wide: '(min-width: 768px)', mobile: '(max-width: 767px)' },
     (ctx) => {
-      const c = ctx.conditions as { desktop: boolean; tablet: boolean; mobile: boolean };
-      return setupSections({ scene, pinService: c.desktop, pinProcess: c.desktop || c.tablet, shift: c.mobile ? 0 : 1 });
+      const c = ctx.conditions as { wide: boolean; mobile: boolean };
+      return setupSections({ scene, shift: c.mobile ? 0 : 1 });
     },
   );
   setupReveals(document, false);
@@ -139,5 +141,5 @@ window.addEventListener('resize', () => {
   if (window.innerWidth === lastWidth) return; // ignore mobile address-bar height changes
   lastWidth = window.innerWidth;
   window.clearTimeout(refreshTimer);
-  refreshTimer = window.setTimeout(refresh, 200);
+  refreshTimer = window.setTimeout(() => { layoutTitleGradient(document.getElementById('hero-title')!); refresh(); }, 200);
 });

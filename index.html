@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#080B1C" />
+    <meta name="theme-color" content="#102149" />
     <title>株式会社SD｜構造が、動き出す。Web制作スタジオ</title>
     <meta
       name="description"
@@ -30,7 +30,7 @@
       href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Inter+Tight:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     />
   </head>
-  <body>
+  <body id="top">
     <a class="skip-link" href="#main">本文へスキップ</a>
 
     <div class="preloader" id="preloader" aria-hidden="true">
@@ -46,10 +46,7 @@
       <div class="cursor__ring"></div>
     </div>
 
-    <div class="bg" aria-hidden="true">
-      <div class="bg-stars"></div>
-      <div class="bg-fallback"></div>
-    </div>
+    <div class="universe" aria-hidden="true"><img src="./images/starfield.webp" alt="" width="1672" height="941" /></div>
     <canvas id="scene" class="scene" aria-hidden="true" tabindex="-1"></canvas>
 
     <header class="header" id="header">
@@ -133,6 +130,7 @@
               <span class="line"><span>同じ手で。</span></span>
             </h2>
             <hr class="rule" data-reveal="rule" />
+            <div class="about__space" aria-hidden="true"></div>
           </div>
           <div class="about__body col-5">
             <p data-reveal="block">
@@ -341,6 +339,7 @@
       <!-- 07 CONTACT -->
       <section class="section section--contact scrim-c" id="contact" data-section="contact">
         <span class="section-num" aria-hidden="true">06</span>
+        <div class="contact-orbits" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="container contact">
           <p class="label" data-reveal="block">06 — CONTACT</p>
           <h2 class="h2 h2--center" data-reveal="lines">

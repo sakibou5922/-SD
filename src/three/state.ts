@@ -5,7 +5,7 @@
 export const sceneState = {
   // morph weights: cloud, sphere, lattice, grid, knot, slab, ring
   w0: 1, w1: 0, w2: 0, w3: 0, w4: 0, w5: 0, w6: 0,
-  noise: 0.12,
+  noise: 0.02,
   pointSize: 2.6,
   opacity: 1,
   lineOpacity: 0,
@@ -17,19 +17,20 @@ export const sceneState = {
   lit0: 0, lit1: 0, lit2: 0, lit3: 0,
   rotX: 0,
   rotY: 0,
+  groupX: 0,
   groupY: 0,
-  idleSpeed: 0.04,
+  groupScale: 1,
+  /** hero planet body + halo */
+  heroPlanet: 1,
+  idleSpeed: 0,
   knotOpacity: 0,
   slabOpacity: 0,
-  /** About: planet body inside the ring of points */
-  planetOpacity: 0,
   /** Contact: light travelling along the ring */
   orbitOpacity: 0,
-  /** Hero: small ringed planet in the far background */
-  farOpacity: 1,
+
   /** background glow centre (0–1 screen space) and warm tint (0 = indigo, 1 = amber) */
   bgX: 0.5, bgY: 0.6, bgWarm: 0,
-  camX: 0, camY: 4.2, camZ: 8.0,
+  camX: 0, camY: 1.1, camZ: 9.0,
   tX: 0, tY: 0, tZ: 0,
   fov: 42,
 };

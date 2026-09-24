@@ -1,7 +1,8 @@
 # 株式会社SD コーポレートサイト
 
 「構造が、動き出す。」— Web制作事業を営む株式会社SDのワンページ・スクロール駆動サイトです。
-背景の 3D 点群（Three.js）がスクロールに合わせて **銀河 → 惑星 → 格子 → 設計図 → 結び目 → 礎 → 輪** と変形し、Web制作の工程を一つのオブジェクトで語ります。
+背景の 3D 点群（Three.js）がスクロールに合わせて **惑星の環 → 原子軌道 → 格子 → 設計図 → 結び目 → 礎 → 輪** と変形し、Web制作の工程を一つのオブジェクトで語ります。
+デザインはクライアント支給の「SD-cosmic-bright」（明るい藍の宇宙、`docs/reference/`）を正とし、その 2D レイアウトの上に 3D を重ねています。
 
 公開 URL: https://sakibou5922.github.io/-SD/
 
@@ -35,10 +36,14 @@ src/ui/header.ts           固定ヘッダー、モバイルメニュー、ア�
 src/ui/indicator.ts        セクションインジケーター
 src/ui/cursor.ts           カスタムカーソル、マグネティックボタン
 src/ui/effects.ts          プリローダー、文字分割リビール、進捗バー、セクション番号、カードのチルト
-src/styles/*.css           トークン / ベース / コンポーネント / セクション
+src/styles/cosmic.css      SD-cosmic-bright 由来のスタイル（支給 CSS を 3D 併用向けに調整）
+src/styles/three.css       3D レイヤー、プリローダー、カーソル、リビール
+public/images/             支給の背景写真（starfield.webp を WebGL 背景に使用）
 docs/brand-brief.md        ブランド戦略・VI・ボイス・全コピー（Brand Guardian / Content Creator）
 docs/scroll-storyboard.md  3D シーン設計・ストーリーボード・性能予算（UX Architect / Visual Storyteller）
 docs/ui-review.md          実装後のレビュー（UI Finish-Gate Reviewer）
+docs/cosmic-bright-3d.md   cosmic-bright 版の 3D 仕様（Visual Storyteller）
+docs/reference/            支給デザインの参照スクリーンショットと元 CSS
 .claude/agents/            使用した agency-agents のペルソナ定義（MIT）
 ```
 
