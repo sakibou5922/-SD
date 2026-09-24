@@ -30,7 +30,7 @@ function bg(tl: gsap.core.Timeline, start: number, end: number, from: Record<str
     const o: Partial3D = {};
     if (v['--bg-x']) o.bgX = parseFloat(v['--bg-x']) / 100;
     if (v['--bg-y']) o.bgY = parseFloat(v['--bg-y']) / 100;
-    if (v['--bg-c']) o.bgWarm = v['--bg-c'].toLowerCase() === '#3a2a6e' ? 1 : 0;
+    if (v['--bg-c']) o.bgWarm = v['--bg-c'].toLowerCase() === '#2a2a66' ? 1 : 0;
     return o;
   };
   seg(tl, start, end, num(from), num(to));
@@ -68,12 +68,12 @@ export function setupSections(o: SectionsOptions): () => void {
   /* ---------- placements (object position / scale per section; hand-offs happen in the previous section's tail) ---------- */
   const W = o.shift;
   const P = {
-    hero:    W ? { gx: 3.3, gy: 0.1, gs: 2.3 } : { gx: 1.1, gy: 3.1, gs: 1.05 },
-    about:   W ? { gx: -3.1, gy: -1.5, gs: 1.0 } : { gx: 0, gy: 1.9, gs: 0.8 },
-    service: W ? { gx: -2.8, gy: -1.6, gs: 0.65 } : { gx: 0.4, gy: 3.0, gs: 0.55 },
-    process: W ? { gx: 3.7, gy: 2.1, gs: 0.7 } : { gx: 0.4, gy: 3.1, gs: 0.6 },
-    works:   W ? { gx: 3.4, gy: -2.7, gs: 0.7 } : { gx: 0.6, gy: 3.3, gs: 0.6 },
-    company: W ? { gx: -3.5, gy: -1.6, gs: 0.9 } : { gx: -0.6, gy: 3.1, gs: 0.7 },
+    hero:    W ? { gx: 2.9, gy: 0.3, gs: 2.5 } : { gx: 0.5, gy: 2.5, gs: 1.1 },
+    about:   W ? { gx: -3.0, gy: -1.4, gs: 1.0 } : { gx: 0, gy: 1.9, gs: 0.8 },
+    service: W ? { gx: -2.8, gy: -1.6, gs: 0.65 } : { gx: 0.6, gy: 3.6, gs: 0.5 },
+    process: W ? { gx: 4.6, gy: 3.4, gs: 0.6 } : { gx: 0.6, gy: 3.6, gs: 0.5 },
+    works:   W ? { gx: 3.4, gy: -2.7, gs: 0.7 } : { gx: 0.8, gy: 3.7, gs: 0.5 },
+    company: W ? { gx: -3.5, gy: -1.6, gs: 0.9 } : { gx: -0.8, gy: 3.6, gs: 0.6 },
     contact: W ? { gx: 0, gy: -0.7, gs: 1.05 } : { gx: 0, gy: 2.3, gs: 1.35 },
   };
   const HERO_CAM = { camX: 0, camY: 1.1, camZ: 9.0 };
@@ -82,10 +82,10 @@ export function setupSections(o: SectionsOptions): () => void {
   /* ---------- 1. Hero — 環つき惑星 ---------- */
   {
     const tl = sectionTimeline('hero');
-    seg(tl, 0, 0.6, { ...HERO_CAM, pointSize: 3.4 }, { camX: 0.2, camY: 1.4, camZ: 8.6, pointSize: 2.8 });
+    seg(tl, 0, 0.6, { ...HERO_CAM, pointSize: 4.0 }, { camX: 0.2, camY: 1.4, camZ: 8.6, pointSize: 3.2 });
     // hand-off: the planet body fades, the ring loosens into the atom and travels to the About corner
-    seg(tl, 0.55, 1, { heroPlanet: 1, groupX: P.hero.gx, groupY: P.hero.gy, groupScale: P.hero.gs, w0: 1, w1: 0, pointSize: 2.8 },
-      { heroPlanet: 0, groupX: P.about.gx, groupY: P.about.gy, groupScale: P.about.gs, w0: 0, w1: 1, pointSize: 1.5 });
+    seg(tl, 0.55, 1, { heroPlanet: 1, groupX: P.hero.gx, groupY: P.hero.gy, groupScale: P.hero.gs, w0: 1, w1: 0, pointSize: 3.2 },
+      { heroPlanet: 0, groupX: P.about.gx, groupY: P.about.gy, groupScale: P.about.gs, w0: 0, w1: 1, pointSize: 1.9 });
     seg(tl, 0.55, 1, { camX: 0.2, camY: 1.4, camZ: 8.6 }, { camX: 0, camY: 0.4, camZ: 8.0 });
     tl.fromTo('#hero-inner', { y: 0, opacity: 1 }, { y: -80, opacity: 0, duration: 0.6, immediateRender: false }, EPS);
     tls.push(tl);
@@ -98,7 +98,7 @@ export function setupSections(o: SectionsOptions): () => void {
     seg(tl, 0, 0.3, { idleSpeed: 0 }, { idleSpeed: 0.04 });
     bg(tl, 0, 0.4, { '--bg-x': '50%', '--bg-y': '60%' }, { '--bg-x': '62%', '--bg-y': '45%' });
     // → Service: atom → lattice, object sinks to the bottom-left corner
-    seg(tl, 0.75, 1, { w1: 1, w2: 0, groupX: P.about.gx, groupY: P.about.gy, groupScale: P.about.gs, camX: 0, camY: 0.4, pointSize: 1.5 },
+    seg(tl, 0.75, 1, { w1: 1, w2: 0, groupX: P.about.gx, groupY: P.about.gy, groupScale: P.about.gs, camX: 0, camY: 0.4, pointSize: 1.9 },
       { w1: 0, w2: 1, groupX: P.service.gx, groupY: P.service.gy, groupScale: P.service.gs, camX: 0.4, camY: 0.6, pointSize: 2.0 });
     tls.push(tl);
   }
@@ -150,7 +150,7 @@ export function setupSections(o: SectionsOptions): () => void {
     const tl = sectionTimeline('works', { start: 'top 80%' });
     seg(tl, 0, 0.25, { knotOpacity: 0, pointSize: 2.0, lineOpacity: 0.35, accentMix: 0.25, colorMix: 0.5 }, { knotOpacity: 0.55, pointSize: 1.6, lineOpacity: 0.15, accentMix: 0.6, colorMix: 1 });
     seg(tl, 0, 0.25, { camX: 1.0, camY: 1.0, camZ: 7.5, tX: 0, fov: 42, opacity: 0.6 }, { camX: 0, camY: 0.3, camZ: 7.5, tX: 0, fov: 42, opacity: 0.55 });
-    bg(tl, 0, 0.25, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#1a3466' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#3a2a6e' });
+    bg(tl, 0, 0.25, { '--bg-x': '50%', '--bg-y': '70%', '--bg-c': '#1a3466' }, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a2a66' });
     seg(tl, 0, 0.7, { tY: 0 }, { tY: 0.2 });
     // the solid fades while the cards are still on screen (brief §3.1: glow stays a minority)
     seg(tl, 0.55, 0.72, { knotOpacity: 0.55 }, { knotOpacity: 0 });
@@ -161,7 +161,7 @@ export function setupSections(o: SectionsOptions): () => void {
       { w4: 0, w5: 1, noise: 0.02, accentMix: 0.15, colorMix: 0.3, rotX: 0, breath: 0.012 });
     seg(tl, 0.74, 1, { camX: 0, camY: 0.3, camZ: 7.5, tX: 0, tY: 0.2, fov: 42, groupX: P.works.gx, groupY: P.works.gy, groupScale: P.works.gs, opacity: 0.55 },
       { camX: -0.6, camY: -0.4, camZ: 8.0, tX: 0, tY: 0.2, fov: 42, groupX: P.company.gx, groupY: P.company.gy, groupScale: P.company.gs, opacity: 0.9 });
-    bg(tl, 0.74, 1, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#3a2a6e' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#1a3466' });
+    bg(tl, 0.74, 1, { '--bg-x': '50%', '--bg-y': '50%', '--bg-c': '#2a2a66' }, { '--bg-x': '35%', '--bg-y': '55%', '--bg-c': '#1a3466' });
     seg(tl, 0.86, 1, { slabOpacity: 0 }, { slabOpacity: 0.8 });
     tls.push(tl);
   }

@@ -4,12 +4,11 @@ html[data-webgl="0"] .scene{display:none}
 .main,.footer{position:relative;z-index:1}
 .header{z-index:70}
 /* text scrims over the 3D (per section) */
-.section::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+.section::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%)}
 .scrim-l::before{background:linear-gradient(90deg,rgba(16,33,73,.72) 0%,rgba(16,33,73,.45) 45%,transparent 75%)}
 .scrim-r::before{background:linear-gradient(270deg,rgba(16,33,73,.72) 0%,rgba(16,33,73,.45) 45%,transparent 75%)}
 .scrim-c::before{background:radial-gradient(64% 56% at 50% 50%,rgba(16,33,73,.8) 0%,rgba(16,33,73,.45) 60%,transparent 100%)}
-.section--hero::before{background:linear-gradient(90deg,rgba(16,33,73,.55) 0%,rgba(16,33,73,.25) 45%,transparent 70%),linear-gradient(0deg,var(--bg),transparent 28%)}
-@media(max-width:767px){.scrim-l::before,.scrim-r::before{background:linear-gradient(180deg,transparent 0%,rgba(16,33,73,.6) 30%,rgba(16,33,73,.8) 100%)}.section--hero::before{background:linear-gradient(180deg,rgba(16,33,73,.15) 0%,transparent 24%,rgba(16,33,73,.55) 55%,var(--bg) 93%)}}
+@media(max-width:767px){.scrim-l::before,.scrim-r::before{background:linear-gradient(180deg,transparent 0%,rgba(16,33,73,.6) 30%,rgba(16,33,73,.8) 100%)}.hero{padding-top:290px!important}}
 /* line + char reveals */
 .line{display:block;overflow:hidden}.line>span{display:block}
 .hero__title .char{display:inline-block;overflow:hidden;vertical-align:top}.hero__title .char>span{display:inline-block;will-change:transform}

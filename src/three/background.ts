@@ -85,7 +85,7 @@ void main() {
 
   // vignette
   float v = smoothstep(1.25, 0.3, length((uv - 0.5) * vec2(aspect, 1.0) * 1.15));
-  col *= mix(0.6, 1.0, v);
+  col *= mix(0.72, 1.0, v);
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -103,7 +103,7 @@ export function createBackground(): { mesh: THREE.Mesh; uniforms: Record<string,
     uStars: { value: 1 },
     uPhoto: { value: null },
     uPhotoMix: { value: 0 },
-    uPhotoDim: { value: 0.78 },
+    uPhotoDim: { value: 0.92 },
     uPhotoOffset: { value: new THREE.Vector2(0, 0) },
   };
   const mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms, depthWrite: false, depthTest: false });

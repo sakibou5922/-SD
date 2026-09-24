@@ -107,7 +107,7 @@ void main() {
   // galaxy ramp (only while the T0 target dominates): warm core → cyan arms → violet rim
   vec3 gcol = mix(uGalCore, uGalArm, smoothstep(0.0, 0.45, aGal));
   gcol = mix(gcol, uGalRim, smoothstep(0.6, 1.0, aGal));
-  gcol *= 1.0 + 0.35 * (1.0 - smoothstep(0.0, 0.3, aGal));
+  gcol *= 1.25 + 0.35 * (1.0 - smoothstep(0.0, 0.3, aGal));
   col = mix(col, gcol, uW[0]);
   vColor = col;
 
@@ -115,7 +115,7 @@ void main() {
   float fog = exp(-uFog * uFog * d * d);
   vAlpha = uOpacity * fog * (0.55 + 0.45 * aSeed);
   // the atom's thin orbits need extra brightness on the lighter background
-  vAlpha *= 1.0 + 0.35 * uW[1];
+  vAlpha *= 1.0 + 0.7 * uW[1];
 
   #ifdef LINE
     vAlpha *= 0.9;
@@ -211,7 +211,7 @@ void main() {
   vec3 body = mix(uBase, uBand, bands * 0.5) * (0.35 + 0.75 * lit);
   float f = pow(1.0 - max(dot(n, v), 0.0), 2.4);
   vec3 rim = mix(uRimDark, uRimLit, smoothstep(-0.2, 0.7, ndl));
-  vec3 c = body + rim * f * 1.6;
+  vec3 c = body + rim * f * 1.4;
   gl_FragColor = vec4(c * uOpacity, uOpacity);
 }
 `;

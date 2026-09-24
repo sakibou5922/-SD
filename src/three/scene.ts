@@ -129,7 +129,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
       premultipliedAlpha: true,
     });
   const pointsMat = mkMaterial({}, 1);
-  const glowMat = mkMaterial({}, opts.isMobile ? 0.12 : 0.06, 3); // halo pass: 3x size (bloom adds the rest on desktop)
+  const glowMat = mkMaterial({}, opts.isMobile ? 0.09 : 0.06, 3); // halo pass: 3x size (bloom adds the rest on desktop)
   const lineMat = mkMaterial({ LINE: '' }, 1);
 
   const points = new THREE.Points(geo, pointsMat);
@@ -164,10 +164,10 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
   group.add(knotMesh, slabMesh);
 
   /* Contact: a light travelling along the ring (T6 geometry: R 2.6, tilted 18°) */
-  const orbitMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#e8f6ff'), transparent: true, opacity: 0, depthWrite: false });
+  const orbitMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffffff'), transparent: true, opacity: 0, depthWrite: false });
   const orbitMesh = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), orbitMat);
-  const orbitGlowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#8ad8ff'), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-  const orbitGlow = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12), orbitGlowMat);
+  const orbitGlowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#9adfff'), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const orbitGlow = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 12), orbitGlowMat);
   orbitMesh.add(orbitGlow);
   orbitMesh.visible = false;
   group.add(orbitMesh);
@@ -236,7 +236,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     uniforms.uNoiseAmp.value = S.noise;
     uniforms.uPointSize.value = S.pointSize;
     uniforms.uBreath.value = S.breath;
-    const mob = opts.isMobile ? 0.45 + 0.55 * Math.min(1, w[0] + w[6]) : 1;
+    const mob = opts.isMobile ? 0.3 + 0.7 * Math.min(1, w[0] + w[6]) : 1;
     uniforms.uOpacity.value = S.opacity * mob;
     uniforms.uAccentMix.value = S.accentMix;
     uniforms.uLineOpacity.value = S.lineOpacity;
@@ -257,7 +257,7 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     planetGroup.visible = S.heroPlanet > 0.002;
     planetMat.uniforms.uOpacity.value = S.heroPlanet;
     planetMat.uniforms.uTime.value = time;
-    haloMat.uniforms.uOpacity.value = 0.55 * S.heroPlanet;
+    haloMat.uniforms.uOpacity.value = 0.48 * S.heroPlanet;
     planetMesh.rotation.y = time * 0.06;
     // ring: spin about its own axis, then the shared tilt
     spinM4.makeRotationY(time * 0.03);
@@ -265,8 +265,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { isMobile: boolean
     (uniforms.uSaturnRot.value as THREE.Matrix3).setFromMatrix4(satM4);
     // orbiting light: ring param → tilt 18° about X (matches the T6 target)
     orbitMesh.visible = S.orbitOpacity > 0.002;
-    orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.5 : 0.8);
-    orbitGlowMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.10 : 0.12);
+    orbitMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.7 : 1.0);
+    orbitGlowMat.opacity = S.orbitOpacity * (opts.isMobile ? 0.18 : 0.28);
     {
       const a = time * 0.45, R = 2.6, tilt = (18 * Math.PI) / 180;
       const x = R * Math.cos(a), z = R * Math.sin(a);

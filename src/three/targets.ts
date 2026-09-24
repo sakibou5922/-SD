@@ -63,8 +63,8 @@ export function buildTargets(opts: TargetOptions): TargetSet {
     const gauss = () => { const u1 = Math.max(rand(), 1e-6), u2 = rand(); return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); };
     for (let i = 0; i < n; i++) {
       let x: number, y: number, z: number;
-      if (i % 12 === 0) {
-        // 8%: halo stars far from the planet
+      if (i % 20 === 0) {
+        // 5%: halo stars far from the planet
         const zz = rand() * 2 - 1, a2 = rand() * Math.PI * 2, sxy = Math.sqrt(1 - zz * zz);
         const r = 3.2 + rand() * 4.5;
         x = sxy * Math.cos(a2) * r; y = zz * r * 0.7; z = sxy * Math.sin(a2) * r;
